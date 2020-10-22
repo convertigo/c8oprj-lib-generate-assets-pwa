@@ -1,0 +1,77 @@
+↓Input_variables [steps.InputVariablesStep-1603208618447]: 
+↓IfFileExistsThenElse [steps.IfFileExistThenElseStep-1603208618450]: 
+  condition: com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName(projectName).getDirPath() + "\\DisplayObjects\\mobile\\index"+target+".html"
+  ↓jThen [steps.ThenStep-1603208618453]: 
+    ↓Element [steps.XMLElementStep-1603208618456]: 
+      nodeName: exists
+      nodeText: true
+  ↓jElse [steps.ElseStep-1603208618459]: 
+    ↓Element [steps.XMLElementStep-1603208618462]: 
+      nodeName: exists
+      nodeText: false
+    ↓Create_directory [steps.CreateDirectoryStep-1603208618465]: 
+      destinationPath: com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName(projectName).getDirPath() + "\\DisplayObjects\\mobile\\assets\\pwa-"+target
+    ↓Duplicate_fileIndexHTML [steps.DuplicateStep-1603208618468]: 
+      copyName: '"index"+target+".html"'
+      overwrite: true
+      sourcePath: com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName(projectName).getDirPath() + "\\DisplayObjects\\mobile\\index.html"
+    ↓Duplicate_fileManifest [steps.DuplicateStep-1603208618471]: 
+      copyName: '"manifest-"+target+".json"'
+      overwrite: true
+      sourcePath: com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName(projectName).getDirPath() + "\\DisplayObjects\\mobile\\assets\\manifest.json"
+    ↓Move_fileManifest [steps.MoveStep-1603208618474]: 
+      destinationPath: com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName(projectName).getDirPath() + "\\DisplayObjects\\mobile\\assets\\pwa-"+target
+      sourcePath: com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName(projectName).getDirPath() + "\\DisplayObjects\\mobile\\assets\\manifest-"+target+".json"
+    ↓Sequence_JS [steps.SimpleStep-1603208618477]: 
+      expression: |
+        // imports
+        var Path = use("java.nio.file.Path");
+        var Paths = use("java.nio.file.Paths");
+        var Files = use("java.nio.file.Files");
+        var StandardCharsets = use("java.nio.charset.StandardCharsets");
+        var String = use("java.lang.String");
+        // get file path
+        var filePath =  Paths.get(com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName(projectName).getDirPath() + "\\DisplayObjects\\mobile\\index"+target+".html");
+        // get charset utf8
+        var charset = StandardCharsets.UTF_8;
+        // get text as string
+        var content = new String(Files.readAllBytes(filePath), charset);
+        // replace new manifest name
+        content = content.replaceAll('<link rel="manifest" href="assets/manifest.json">', '<link rel="manifest" href="assets/pwa-'+target+'/manifest'+target+'.json">');
+        Files.write(filePath, content.getBytes(charset));
+↓ComputeCommandLine [steps.SimpleStep-1603208618480]: 
+  expression: |
+    'try{
+    	var dirPath = com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName(projectName).getDirPath();	
+    	log.debug("Founded dirPath for: " + projectName + " is: " + dirPath);
+    	
+    	jIndex    = dirPath + "\\DisplayObjects\\mobile\\index"+target+".html";
+    	jManifest = dirPath + (target == "" ? "\\DisplayObjects\\mobile\\assets\\manifest.json":"\\DisplayObjects\\mobile\\assets\\pwa-"+target+"\\manifest-"+target+".json");
+    	jDest     = dirPath + (target == "" ? "\\DisplayObjects\\mobile\\assets":"\\DisplayObjects\\mobile\\assets\\pwa-"+target);
+    	jLogo     = image + "";
+    	jCmd = "cmd /c ..\\node\\pwa-asset-generator " + jLogo + " -i " + jIndex + " -m " + jManifest + " " + jDest;
+    	log.debug("*************" + jCmd);
+    }
+    catch(e){
+    	log.warning("[GenerateAssets]: an error occured while trying to generate assets");
+    }
+    
+    
+    '
+↓Process_execute [steps.ProcessExecStep-1603208618483]: 
+  commandLine: jCmd
+  executionDirectory: .//assets
+  output: true
+↓image [variables.RequestableVariable-1603208621764]: 
+  isFileUpload: true
+↓projectName [variables.RequestableVariable-1603208621767]: 
+↓target [variables.RequestableVariable-1603208621770]: 
+  value: 
+↓pwaName [variables.RequestableVariable-1603208621773]: 
+  value: 
+↓pwaShortName [variables.RequestableVariable-1603208621776]: 
+  value: 
+↓pwaBackgroundColor [variables.RequestableVariable-1603208621779]: 
+  value: 
+↓pwaThemeColor [variables.RequestableVariable-1603208621782]: 
+  value: 
