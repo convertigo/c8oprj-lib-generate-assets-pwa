@@ -1,8 +1,6 @@
 ↑convertigo: 7.6.0.m006
 ↓lib_GeneratePWAAssets [core.Project]: 
   comment: Mashup Sequencer project
-  version: 1.32
+  version: 1.0.0
   ↓void [connectors.SqlConnector]: 🗏 connectors/void.yaml
   ↓generateAssets [sequences.GenericSequence]: 🗏 sequences/generateAssets.yaml
-  ↓Generic_Sequence [sequences.GenericSequence]: 🗏 sequences/Generic_Sequence.yaml
-  ↓Generic_Sequence1 [sequences.GenericSequence]: 🗏 sequences/Generic_Sequence1.yaml

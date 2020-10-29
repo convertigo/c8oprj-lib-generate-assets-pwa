@@ -136,7 +136,7 @@ responseTimeout: 600
     	jLogo     = image + "";
     	var jCmd = isWindows ? 
     			"cmd /C " +file+separator+"pwa-asset-generator " + jLogo + " -i " + jIndex + " -m " + jManifest + " " + jDest:
-    			["bash", "-c", "PATH=" + file + ":$PATH pwa-asset-generator " + jLogo + " -i " + jIndex + " -m " + jManifest + " " + jDest]
+    			["bash", "-c", "time PATH=" + file + ":$PATH pwa-asset-generator " + jLogo + " -i " + jIndex + " -m " + jManifest + " " + jDest]
     	log.debug("will execute following command to execute pwa-asset-generator => \n "+ jCmd);
     }
     catch(e){
@@ -146,6 +146,7 @@ responseTimeout: 600
     
     
     '
+  output: true
 ↓Process_execute [steps.ProcessExecStep-1601291368434]: 
   commandLine: jCmd
   comment: execute pwa-assets-generator
@@ -218,12 +219,16 @@ responseTimeout: 600
     																 "/convertigo/projects/" + projectName + "/DisplayObjects/pwas/"+target+"/");
     try {
     	var others = JSON.parse(additionalParametersJSONObjectString);
+    	log.warning("additionalParametersJSONObjectString")
+    	log.warning(JSON.stringify(others));
     	for (var i in others) {
-    		if(["name", "short_name", "start_url", "display", "icons", "background_color", "theme_color"].indexOf(i) == -1){
+    		log.warning("i:" +i);
+    		if(["name", "short_name", "start_url", "display", "icons", "background_color", "theme_color", "scope"].indexOf(i) == -1){
+    			log.warning("others[i] :" +others[i]);
     			others[i] != "" ? jsonManifest[i] = others[i] : null;
     		}
     		else{
-    			log.debu("additionalParametersJSONObjectString, key " + i + " is forbidden");
+    			log.debug("additionalParametersJSONObjectString, key " + i + " is forbidden");
     		}
     		
     	}
@@ -245,12 +250,13 @@ responseTimeout: 600
       		var mobilePath = projectPath + separator+"DisplayObjects"+separator+"mobile"+separator;
       		var cmdSymLink = isWindows ?
       				"cmd /C mklink /D "+pwaPath+target+separator+"assets " + mobilePath + "assets && mklink /D "+pwaPath+target+separator+"build " + mobilePath + "build":
-      				["bash", "-c" ,"ln -sfn " + mobilePath + "assets " + pwaPath+target+separator+"assets ; ln -sfn " + mobilePath + "build " + pwaPath+target+separator+"build"];	
+      				["bash", "-c" ,"ln -sfn " + mobilePath + "assets " + pwaPath+target+separator+"assets && ln -sfn " + mobilePath + "build " + pwaPath+target+separator+"build"];	
       		log.debug("will execute following command to create symlinks => \n "+ cmdSymLink);
       	}
       }
       catch(e){
-      	
+      	log.warning("error creating symlinks");
+      	log.warning(""+e);
       }'
     output: true
   ↓Process_execute [steps.ProcessExecStep-1603297502894]: 
@@ -298,17 +304,14 @@ responseTimeout: 600
     		var npmCmd = ["bash","-c","cd " +projectPath+ "; PATH=" + file + ":$PATH ngsw-config ./DisplayObjects/pwas/"+target+ " "+ tplNgwwConfigJsonRelativePath+ " /convertigo/projects/" + projectName +"/DisplayObjects/pwas/"+target+"/"];
     	}
     	else{
-    		var npmCmd = ["bash","-c","cd " +projectPath+ "; PATH=" + file + ":$PATH ngsw-config ./DisplayObjects/mobile/ " + tplNgwwConfigJsonRelativePath+ " /convertigo/projects/" + projectName +"/DisplayObjects/mobile/"];
+    		var npmCmd = ["bash","-c","cd " +projectPath+ "; time PATH=" + file + ":$PATH ngsw-config ./DisplayObjects/mobile/ " + tplNgwwConfigJsonRelativePath+ " /convertigo/projects/" + projectName +"/DisplayObjects/mobile/"];
     	}
     }
     log.debug("will execute following command to generate ngsw-config => \n "+ npmCmd);'
-↓IfFileExistsThenElse2 [steps.IfFileExistThenElseStep-1603366735360]: 
-  condition: tplNgwwConfigJsonPath
-  ↓jThen [steps.ThenStep-1603366736774]: 
-    ↓Process_execute [steps.ProcessExecStep-1603370069530]: 
-      commandLine: npmCmd
-      output: true
-  ↓jElse [steps.ElseStep-1603366736776]: 
+  output: true
+↓Process_execute1 [steps.ProcessExecStep-1603717934130]: 
+  commandLine: npmCmd
+  output: true
 ↓Sequence_JSPrintTotalTime [steps.SimpleStep-1603454406635]: 
   expression: |
     '//Register time end
