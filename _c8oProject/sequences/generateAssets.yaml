@@ -54,75 +54,132 @@ responseTimeout: 600
     ↓Process_execute1 [steps.ProcessExecStep-1603269268181]: 
       commandLine: npmInstall
       output: true
-↓jIf [steps.IfStep-1603208640123]: 
-  comment: if a target is defined then create a new index.html and manifest from existing one
+↓jIfThenElse [steps.IfThenElseStep-1604053867706]: 
   condition: target != ""
-  ↓Create_directory [steps.CreateDirectoryStep-1603207036703]: 
-    comment: create a dir for the target
-    destinationPath: pwaPath+target+separator+"pwa-assets"
-  ↓Duplicate_fileIndexHTML [steps.DuplicateStep-1603204615018]: 
-    comment: duplicate index.html named with target name
-    copyName: '"index"+target+".html"'
-    overwrite: true
-    sourcePath: projectPath +separator+"DisplayObjects"+separator+"mobile"+separator+"index.html"
-  ↓Move_fileIndexHTML [steps.MoveStep-1603292524784]: 
-    comment: move file manifest to our new dir
-    destinationPath: pwaPath+target
-    overwrite: true
-    sourcePath: projectPath +separator+"DisplayObjects"+separator+"mobile"+separator+"index"+target+".html"
-  ↓Rename_fileIndexHTML [steps.RenameStep-1603292584762]: 
-    comment: rename index-targetName.html to index.html
-    newName: '"index.html"'
-    overwrite: true
-    sourcePath: pwaPath+target+separator+"index"+target+".html"
-  ↓Duplicate_fileManifest [steps.DuplicateStep-1603206186277]: 
-    comment: duplicate manifest.json named with target name
-    copyName: '"manifest-"+target+".json"'
-    overwrite: true
-    sourcePath: projectPath +separator+"DisplayObjects"+separator+"mobile"+separator+"assets"+separator+"manifest.json"
-  ↓Move_fileManifest [steps.MoveStep-1603207269396]: 
-    comment: move file manifest to our new dir
-    destinationPath: pwaPath+separator+target
-    overwrite: true
-    sourcePath: projectPath +separator+ "DisplayObjects"+separator+"mobile"+separator+"assets"+separator+"manifest-"+target+".json"
-  ↓Rename_fileManifest [steps.RenameStep-1603292877386]: 
-    comment: rename manifest-targetName.json to manifest.json
-    newName: '"manifest.json"'
-    overwrite: true
-    sourcePath: pwaPath+target+separator+"manifest-"+target+".json"
-  ↓Duplicate_fileNGSWWORKER [steps.DuplicateStep-1603294005702]: 
-    comment: duplicate ngsw-worker.js named with target name
-    copyName: '"ngsw-worker-"+target+".js"'
-    overwrite: true
-    sourcePath: projectPath +separator+"DisplayObjects"+separator+"mobile"+separator+"ngsw-worker.js"
-  ↓Move_fileNGSWWORKER [steps.MoveStep-1603293049574]: 
-    comment: move file ngsw-worker to our new dir
-    destinationPath: pwaPath+target
-    overwrite: true
-    sourcePath: projectPath +separator+"DisplayObjects"+separator+"mobile"+separator+"ngsw-worker-"+target+".js"
-  ↓Rename_fileNGSWWORKER [steps.RenameStep-1603294146873]: 
-    comment: rename ngsw-worker-targetName.js to ngsw-worker.js
-    newName: '"ngsw-worker.js"'
-    overwrite: true
-    sourcePath: pwaPath+target+separator+"ngsw-worker-"+target+".js"
-  ↓Sequence_JSReplaceLinkForManifest [steps.SimpleStep-1603204926368]: 
-    comment: change link for our new manifest
-    expression: |
-      // imports
-      var Path = use("java.nio.file.Path");
-      var Paths = use("java.nio.file.Paths");
-      var Files = use("java.nio.file.Files");
-      var StandardCharsets = use("java.nio.charset.StandardCharsets");
-      var String = use("java.lang.String");
-      // get file path
-      var filePath =  Paths.get(pwaPath+target+separator+"index.html");
-      // get charset utf8
-      var charset = StandardCharsets.UTF_8;
-      // get text as string
-      var content = new String(Files.readAllBytes(filePath), charset);
-      // replace new manifest name
-      content = content.replaceAll('<link rel="manifest" href="assets/manifest.json">', '<link rel="manifest" href="./manifest.json">');
-      Files.write(filePath, content.getBytes(charset));
+  ↓jThen [steps.ThenStep-1604053867708]: 
+    ↓Create_directory [steps.CreateDirectoryStep-1603207036703]: 
+      comment: create a dir for the target
+      destinationPath: pwaPath+target+separator+"pwa-assets"
+    ↓Duplicate_fileIndexHTML [steps.DuplicateStep-1603204615018]: 
+      comment: duplicate index.html named with target name
+      copyName: '"index"+target+".html"'
+      overwrite: true
+      sourcePath: projectPath +separator+"DisplayObjects"+separator+"mobile"+separator+"index.html"
+    ↓Move_fileIndexHTML [steps.MoveStep-1603292524784]: 
+      comment: move file manifest to our new dir
+      destinationPath: pwaPath+target
+      overwrite: true
+      sourcePath: projectPath +separator+"DisplayObjects"+separator+"mobile"+separator+"index"+target+".html"
+    ↓Rename_fileIndexHTML [steps.RenameStep-1603292584762]: 
+      comment: rename index-targetName.html to index.html
+      newName: '"index.html"'
+      overwrite: true
+      sourcePath: pwaPath+target+separator+"index"+target+".html"
+    ↓Duplicate_fileManifest [steps.DuplicateStep-1603206186277]: 
+      comment: duplicate manifest.json named with target name
+      copyName: '"manifest-"+target+".json"'
+      overwrite: true
+      sourcePath: projectPath +separator+"DisplayObjects"+separator+"mobile"+separator+"assets"+separator+"manifest.json"
+    ↓Move_fileManifest [steps.MoveStep-1603207269396]: 
+      comment: move file manifest to our new dir
+      destinationPath: pwaPath+separator+target
+      overwrite: true
+      sourcePath: projectPath +separator+ "DisplayObjects"+separator+"mobile"+separator+"assets"+separator+"manifest-"+target+".json"
+    ↓Rename_fileManifest [steps.RenameStep-1603292877386]: 
+      comment: rename manifest-targetName.json to manifest.json
+      newName: '"manifest.json"'
+      overwrite: true
+      sourcePath: pwaPath+target+separator+"manifest-"+target+".json"
+    ↓Duplicate_fileNGSWWORKER [steps.DuplicateStep-1603294005702]: 
+      comment: duplicate ngsw-worker.js named with target name
+      copyName: '"ngsw-worker-"+target+".js"'
+      overwrite: true
+      sourcePath: projectPath +separator+"DisplayObjects"+separator+"mobile"+separator+"ngsw-worker.js"
+    ↓Move_fileNGSWWORKER [steps.MoveStep-1603293049574]: 
+      comment: move file ngsw-worker to our new dir
+      destinationPath: pwaPath+target
+      overwrite: true
+      sourcePath: projectPath +separator+"DisplayObjects"+separator+"mobile"+separator+"ngsw-worker-"+target+".js"
+    ↓Rename_fileNGSWWORKER [steps.RenameStep-1603294146873]: 
+      comment: rename ngsw-worker-targetName.js to ngsw-worker.js
+      newName: '"ngsw-worker.js"'
+      overwrite: true
+      sourcePath: pwaPath+target+separator+"ngsw-worker-"+target+".js"
+    ↓Sequence_JSReplaceLinkForManifest [steps.SimpleStep-1603204926368]: 
+      comment: change link for our new manifest
+      expression: |
+        '// imports
+        var Path = use("java.nio.file.Path");
+        var Paths = use("java.nio.file.Paths");
+        var Files = use("java.nio.file.Files");
+        var StandardCharsets = use("java.nio.charset.StandardCharsets");
+        var String = use("java.lang.String");
+        // get file path
+        var filePath =  Paths.get(pwaPath+target+separator+"index.html");
+        // get charset utf8
+        var charset = StandardCharsets.UTF_8;
+        // get text as string
+        var content = new String(Files.readAllBytes(filePath), charset);
+        // replace new manifest name
+        content = content.replaceAll(''<link rel="manifest" href="assets/manifest.json">'', ''<link rel="manifest" href="./manifest.json">'');
+        try{
+        		log.warning("tgere");
+        		log.warning(pwaName);
+        		// replace title
+        		var regexTitle = "<title>.*<\/title>";
+        		content = content.replaceAll(regexTitle, "<title>"+pwaName+"</title>");
+        		// replace icon
+        		var regexIcn = ''<link rel="icon" type=".*" href=".*">''
+        		content = content.replaceAll(regexIcn, ''<link rel="icon" type="image/png" href="pwa-assets/manifest-icon-192.png"/>'');
+        		// replace theme-color
+        		var regexTheme = ''<meta name="theme-color" content=".*">'';
+        		content = content.replaceAll(regexTheme, ''<meta name="theme-color" content="''+pwaThemeColor+''">'');
+        		log.warning(JSON.stringify(""+content));
+        }
+        catch(e){
+        	log.warning("error index");
+        	log.warning(JSON.stringify(e));
+        }
+        
+        
+        Files.write(filePath, content.getBytes(charset));'
+  ↓jElse [steps.ElseStep-1604053867710]: 
+    ↓Sequence_JSReplaceLinkForManifest [steps.SimpleStep-1604053875571]: 
+      comment: change link for our new manifest
+      expression: |
+        '// imports
+        var Path = use("java.nio.file.Path");
+        var Paths = use("java.nio.file.Paths");
+        var Files = use("java.nio.file.Files");
+        var StandardCharsets = use("java.nio.charset.StandardCharsets");
+        var String = use("java.lang.String");
+        // get file path
+        var filePath =  Paths.get(projectPath+separator+"DisplayObjects"+separator+"mobile"+separator+"index.html");
+        // get charset utf8
+        var charset = StandardCharsets.UTF_8;
+        // get text as string
+        var content = new String(Files.readAllBytes(filePath), charset);
+        try{
+        		log.warning("tgere");
+        		log.warning(pwaName);
+        		// replace title
+        		var regexTitle = "<title>.*<\/title>";
+        		content = content.replaceAll(regexTitle, "<title>"+pwaName+"</title>");
+        		// replace icon
+        		var regexIcn = ''<link rel="icon" type=".*" href=".*">''
+        		content = content.replaceAll(regexIcn, ''<link rel="icon" type="image/png" href="pwa-assets/manifest-icon-192.png"/>'');
+        		// replace theme-color
+        		var regexTheme = ''<meta name="theme-color" content=".*">'';
+        		content = content.replaceAll(regexTheme, ''<meta name="theme-color" content="''+pwaThemeColor+''">'');
+        		log.warning(JSON.stringify(""+content));
+        }
+        catch(e){
+        	log.warning("error index");
+        	log.warning(JSON.stringify(e));
+        }
+        
+        
+        Files.write(filePath, content.getBytes(charset));'
 ↓computeCommandLine [steps.SimpleStep-1601370249246]: 
   comment: prepare args for pwa-assets-generator
   expression: |
