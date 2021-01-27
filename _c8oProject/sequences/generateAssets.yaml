@@ -184,6 +184,11 @@ responseTimeout: 600
   comment: prepare args for pwa-assets-generator
   expression: |
     'try{
+    	var s = " ";
+    	if(scrape != "true"){
+    		s = " -s false ";
+    	}
+    	
     	jIndex    = ((target == undefined || target == "" ) ? projectPath + separator+"DisplayObjects"+separator+"mobile"+separator+"index"+".html" :
     														  pwaPath + target + separator + "index" + ".html");
     	jManifest = ((target == undefined || target == "" ) ? projectPath + separator+"DisplayObjects"+separator+"mobile"+separator+"assets"+separator+"manifest.json" :
@@ -192,8 +197,10 @@ responseTimeout: 600
     														  pwaPath + target + separator + "pwa-assets");
     	jLogo     = image + "";
     	var jCmd = isWindows ? 
-    			"cmd /C " +file+separator+"pwa-asset-generator " + jLogo + " -i " + jIndex + " -m " + jManifest + " " + jDest:
-    			["bash", "-c", "time PATH=" + file + ":$PATH pwa-asset-generator " + jLogo + " -i " + jIndex + " -m " + jManifest + " " + jDest]
+    			"cmd /C " +file+separator+"pwa-asset-generator " + jLogo + " -i " + jIndex + " -m " + jManifest + s + jDest:
+    			["bash", "-c", "time PATH=" + file + ":$PATH pwa-asset-generator " + jLogo + " -i " + jIndex + " -m " + jManifest + s + jDest]
+    	
+    	
     	log.debug("will execute following command to execute pwa-asset-generator => \n "+ jCmd);
     }
     catch(e){
@@ -392,3 +399,6 @@ responseTimeout: 600
   value: '{}'
 ↓queryParameters [variables.RequestableVariable-1603213820516]: 
   value: 
+↓scrape [variables.RequestableVariable-1611739766791]: 
+  comment: 'Scraping Apple Human Interface guidelines to fetch splash screen specs  [default: "false"]'
+  value: false
