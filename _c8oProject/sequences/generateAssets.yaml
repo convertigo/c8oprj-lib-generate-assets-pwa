@@ -19,10 +19,21 @@ responseTimeout: 600
     }
     // compute dir for pwas
     var pwaPath = projectPath + separator +"DisplayObjects"+separator+"pwas"+separator;
-    
+    log.debug("Sequence lib_GeneratePWAAssets.GenaratePwaAssets has been called");
+    log.debug("We will generate pwa named "+pwaName+ (target != "" ? " with target: " + target : "with no target") +", "+ (onlyReGenerateNGSW == "false" ? "(Full re-generation)": ("Only re-generating ngsw")));
     log.debug("Generate Assets => \nUnix OS = "+isWindows+ " \nSeparator that will be used is: "+separator+" \nTargeted project path is: "+projectPath+" \nNode path is: "+file);'
+↓jSimpleSource [steps.SimpleSourceStep-1612458925042]: 
+  sourceDefinition: 
+    - xmlizable: 
+      - ↑classname: com.twinsoft.convertigo.beans.common.XMLVector
+      - com.twinsoft.convertigo.beans.common.XMLVector: 
+        - java.lang.String: 
+          - ↑value: 1601370188093
+        - java.lang.String: 
+          - ↑value: ./onlyReGenerateNGSW/text()
+  variableName: onlyNGSW
 ↓jIf [steps.IfStep-1612438658991]: 
-  condition: onlyReGenerateNGSW != "false"
+  condition: onlyNGSW == "false"
   ↓IfFileExistsThenElse1 [steps.IfFileExistThenElseStep-1603354922838]: 
     comment: search if npm lib @angular/service-worker is already installed
     condition: file + separator + "ngsw-config"
@@ -125,7 +136,6 @@ responseTimeout: 600
           // replace new manifest name
           content = content.replaceAll(''<link rel="manifest" href="assets/manifest.json">'', ''<link rel="manifest" href="./manifest.json">'');
           try{
-          		log.warning("tgere");
           		log.warning(pwaName);
           		// replace title
           		var regexTitle = "<title>.*<\/title>";
@@ -136,7 +146,6 @@ responseTimeout: 600
           		// replace theme-color
           		var regexTheme = ''<meta name="theme-color" content=".*">'';
           		content = content.replaceAll(regexTheme, ''<meta name="theme-color" content="''+pwaThemeColor+''">'');
-          		log.warning(JSON.stringify(""+content));
           }
           catch(e){
           	log.warning("error index");
@@ -162,8 +171,6 @@ responseTimeout: 600
           // get text as string
           var content = new String(Files.readAllBytes(filePath), charset);
           try{
-          		log.warning("tgere");
-          		log.warning(pwaName);
           		// replace title
           		var regexTitle = "<title>.*<\/title>";
           		content = content.replaceAll(regexTitle, "<title>"+pwaName+"</title>");
