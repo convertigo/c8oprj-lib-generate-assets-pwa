@@ -21,311 +21,313 @@ responseTimeout: 600
     var pwaPath = projectPath + separator +"DisplayObjects"+separator+"pwas"+separator;
     
     log.debug("Generate Assets => \nUnix OS = "+isWindows+ " \nSeparator that will be used is: "+separator+" \nTargeted project path is: "+projectPath+" \nNode path is: "+file);'
-↓IfFileExistsThenElse1 [steps.IfFileExistThenElseStep-1603354922838]: 
-  comment: search if npm lib @angular/service-worker is already installed
-  condition: file + separator + "ngsw-config"
-  ↓jThen [steps.ThenStep-1603354924988]: 
-    ↓Sequence_JSLogNoNeededInstall [steps.SimpleStep-1603452924792]: 
-      expression: log.debug("@angular/service-worker@5.2.11 is already installed, no need to install again");
-  ↓jElse [steps.ElseStep-1603354924990]: 
-    ↓Sequence_JSInstallServiceWorker [steps.SimpleStep-1603452735717]: 
-      expression: |
-        // create command to install npm package  @angular/service-worker@5.2.11 if doesn't exist yet
-        var npmInstallBis = isWindows ?
-        		"cmd /C "+file + separator + "npm i -g @angular/service-worker@5.2.11"  :
-        			["bash","-c","PATH=" + file + ":$PATH npm i -g @angular/service-worker@5.2.11"];
-        log.debug("will execute following command to install @angular/service-worker@5.2.11 => \n "+ npmInstallBis);
-    ↓Process_execute1 [steps.ProcessExecStep-1603354805680]: 
-      commandLine: npmInstallBis
-↓IfFileExistsThenElse [steps.IfFileExistThenElseStep-1603273719750]: 
-  comment: search if npm lib pwa-asset-generator is already installed
-  condition: file + separator + "pwa-asset-generator"
-  ↓jThen [steps.ThenStep-1603273719752]: 
-    ↓Sequence_JSLogNoNeededInstall [steps.SimpleStep-1603452990036]: 
-      expression: log.debug("pwa-assets-generator is already installed, no need to install again");
-  ↓jElse [steps.ElseStep-1603273719754]: 
-    ↓Sequence_JSInstallPwaAssetsGenerator [steps.SimpleStep-1603453010744]: 
-      expression: |
-        // create command to install npm package pwa-asset-generator if doesn't exist yet
-        var npmInstall = isWindows ?
-        		"cmd /C "+file + separator + "npm i -g pwa-asset-generator"  :
-        			["bash","-c","PATH=" + file + ":$PATH npm i -g pwa-asset-generator"];
-        log.debug("will execute following command to install pwa-asset-generator => \n "+ npmInstall);
-    ↓Process_execute1 [steps.ProcessExecStep-1603269268181]: 
-      commandLine: npmInstall
-      output: true
-↓jIfThenElse [steps.IfThenElseStep-1604053867706]: 
-  condition: target != ""
-  ↓jThen [steps.ThenStep-1604053867708]: 
-    ↓Create_directory [steps.CreateDirectoryStep-1603207036703]: 
-      comment: create a dir for the target
-      destinationPath: pwaPath+target+separator+"pwa-assets"
-    ↓Duplicate_fileIndexHTML [steps.DuplicateStep-1603204615018]: 
-      comment: duplicate index.html named with target name
-      copyName: '"index"+target+".html"'
-      overwrite: true
-      sourcePath: projectPath +separator+"DisplayObjects"+separator+"mobile"+separator+"index.html"
-    ↓Move_fileIndexHTML [steps.MoveStep-1603292524784]: 
-      comment: move file manifest to our new dir
-      destinationPath: pwaPath+target
-      overwrite: true
-      sourcePath: projectPath +separator+"DisplayObjects"+separator+"mobile"+separator+"index"+target+".html"
-    ↓Rename_fileIndexHTML [steps.RenameStep-1603292584762]: 
-      comment: rename index-targetName.html to index.html
-      newName: '"index.html"'
-      overwrite: true
-      sourcePath: pwaPath+target+separator+"index"+target+".html"
-    ↓Duplicate_fileManifest [steps.DuplicateStep-1603206186277]: 
-      comment: duplicate manifest.json named with target name
-      copyName: '"manifest-"+target+".json"'
-      overwrite: true
-      sourcePath: projectPath +separator+"DisplayObjects"+separator+"mobile"+separator+"assets"+separator+"manifest.json"
-    ↓Move_fileManifest [steps.MoveStep-1603207269396]: 
-      comment: move file manifest to our new dir
-      destinationPath: pwaPath+separator+target
-      overwrite: true
-      sourcePath: projectPath +separator+ "DisplayObjects"+separator+"mobile"+separator+"assets"+separator+"manifest-"+target+".json"
-    ↓Rename_fileManifest [steps.RenameStep-1603292877386]: 
-      comment: rename manifest-targetName.json to manifest.json
-      newName: '"manifest.json"'
-      overwrite: true
-      sourcePath: pwaPath+target+separator+"manifest-"+target+".json"
-    ↓Duplicate_fileNGSWWORKER [steps.DuplicateStep-1603294005702]: 
-      comment: duplicate ngsw-worker.js named with target name
-      copyName: '"ngsw-worker-"+target+".js"'
-      overwrite: true
-      sourcePath: projectPath +separator+"DisplayObjects"+separator+"mobile"+separator+"ngsw-worker.js"
-    ↓Move_fileNGSWWORKER [steps.MoveStep-1603293049574]: 
-      comment: move file ngsw-worker to our new dir
-      destinationPath: pwaPath+target
-      overwrite: true
-      sourcePath: projectPath +separator+"DisplayObjects"+separator+"mobile"+separator+"ngsw-worker-"+target+".js"
-    ↓Rename_fileNGSWWORKER [steps.RenameStep-1603294146873]: 
-      comment: rename ngsw-worker-targetName.js to ngsw-worker.js
-      newName: '"ngsw-worker.js"'
-      overwrite: true
-      sourcePath: pwaPath+target+separator+"ngsw-worker-"+target+".js"
-    ↓Sequence_JSReplaceLinkForManifest [steps.SimpleStep-1603204926368]: 
-      comment: change link for our new manifest
-      expression: |
-        '// imports
-        var Path = use("java.nio.file.Path");
-        var Paths = use("java.nio.file.Paths");
-        var Files = use("java.nio.file.Files");
-        var StandardCharsets = use("java.nio.charset.StandardCharsets");
-        var String = use("java.lang.String");
-        // get file path
-        var filePath =  Paths.get(pwaPath+target+separator+"index.html");
-        // get charset utf8
-        var charset = StandardCharsets.UTF_8;
-        // get text as string
-        var content = new String(Files.readAllBytes(filePath), charset);
-        // replace new manifest name
-        content = content.replaceAll(''<link rel="manifest" href="assets/manifest.json">'', ''<link rel="manifest" href="./manifest.json">'');
-        try{
-        		log.warning("tgere");
-        		log.warning(pwaName);
-        		// replace title
-        		var regexTitle = "<title>.*<\/title>";
-        		content = content.replaceAll(regexTitle, "<title>"+pwaName+"</title>");
-        		// replace icon
-        		var regexIcn = ''<link rel="icon" type=".*" href=".*">''
-        		content = content.replaceAll(regexIcn, ''<link rel="icon" type="image/png" href="pwa-assets/manifest-icon-192.png"/>'');
-        		// replace theme-color
-        		var regexTheme = ''<meta name="theme-color" content=".*">'';
-        		content = content.replaceAll(regexTheme, ''<meta name="theme-color" content="''+pwaThemeColor+''">'');
-        		log.warning(JSON.stringify(""+content));
-        }
-        catch(e){
-        	log.warning("error index");
-        	log.warning(JSON.stringify(e));
-        }
-        
-        
-        Files.write(filePath, content.getBytes(charset));'
-  ↓jElse [steps.ElseStep-1604053867710]: 
-    ↓Sequence_JSReplaceLinkForManifest [steps.SimpleStep-1604053875571]: 
-      comment: change link for our new manifest
-      expression: |
-        '// imports
-        var Path = use("java.nio.file.Path");
-        var Paths = use("java.nio.file.Paths");
-        var Files = use("java.nio.file.Files");
-        var StandardCharsets = use("java.nio.charset.StandardCharsets");
-        var String = use("java.lang.String");
-        // get file path
-        var filePath =  Paths.get(projectPath+separator+"DisplayObjects"+separator+"mobile"+separator+"index.html");
-        // get charset utf8
-        var charset = StandardCharsets.UTF_8;
-        // get text as string
-        var content = new String(Files.readAllBytes(filePath), charset);
-        try{
-        		log.warning("tgere");
-        		log.warning(pwaName);
-        		// replace title
-        		var regexTitle = "<title>.*<\/title>";
-        		content = content.replaceAll(regexTitle, "<title>"+pwaName+"</title>");
-        		// replace icon
-        		var regexIcn = ''<link rel="icon" type=".*" href=".*">''
-        		content = content.replaceAll(regexIcn, ''<link rel="icon" type="image/png" href="pwa-assets/manifest-icon-192.png"/>'');
-        		// replace theme-color
-        		var regexTheme = ''<meta name="theme-color" content=".*">'';
-        		content = content.replaceAll(regexTheme, ''<meta name="theme-color" content="''+pwaThemeColor+''">'');
-        		log.warning(JSON.stringify(""+content));
-        }
-        catch(e){
-        	log.warning("error index");
-        	log.warning(JSON.stringify(e));
-        }
-        
-        
-        Files.write(filePath, content.getBytes(charset));'
-↓computeCommandLine [steps.SimpleStep-1601370249246]: 
-  comment: prepare args for pwa-assets-generator
-  expression: |
-    'try{
-    	var s = " ";
-    	if(scrape != "true"){
-    		s = " -s false ";
-    	}
-    	
-    	jIndex    = ((target == undefined || target == "" ) ? projectPath + separator+"DisplayObjects"+separator+"mobile"+separator+"index"+".html" :
-    														  pwaPath + target + separator + "index" + ".html");
-    	jManifest = ((target == undefined || target == "" ) ? projectPath + separator+"DisplayObjects"+separator+"mobile"+separator+"assets"+separator+"manifest.json" :
-    														  pwaPath + target + separator + "manifest.json");
-    	jDest     = ((target == undefined || target == "") ?  projectPath + separator + "DisplayObjects" + separator + "mobile" + separator + "assets" :
-    														  pwaPath + target + separator + "pwa-assets");
-    	jLogo     = image + "";
-    	var jCmd = isWindows ? 
-    			"cmd /C " +file+separator+"pwa-asset-generator " + jLogo + " -i " + jIndex + " -m " + jManifest + s + jDest:
-    			["bash", "-c", "time PATH=" + file + ":$PATH pwa-asset-generator " + jLogo + " -i " + jIndex + " -m " + jManifest + s + jDest]
-    	
-    	
-    	log.debug("will execute following command to execute pwa-asset-generator => \n "+ jCmd);
-    }
-    catch(e){
-    	log.warning("pwa-asset-generator an error occured while trying to generate assets");
-    	log.warning(e);
-    }
-    
-    
-    '
-  output: true
-↓Process_execute [steps.ProcessExecStep-1601291368434]: 
-  commandLine: jCmd
-  comment: execute pwa-assets-generator
-  executionDirectory: .//assets
-  output: true
-↓Complex [steps.XMLComplexStep-1603208858186]: 
-  nodeName: status
-  ↓Complex [steps.XMLComplexStep-1603208980630]: 
-    nodeName: pwa-asset-generator
-    ↓pwaAssetGenerator2 [steps.XMLElementStep-1603209014151]: 
-      nodeName: exit-status
-      sourceDefinition: 
-        - xmlizable: 
-          - ↑classname: com.twinsoft.convertigo.beans.common.XMLVector
-          - com.twinsoft.convertigo.beans.common.XMLVector: 
-            - java.lang.String: 
-              - ↑value: 1601291368434
-            - java.lang.String: 
-              - ↑value: ./exit/text()
-    ↓pwaAssetGenerator [steps.XMLElementStep-1603208913543]: 
-      nodeName: output
-      sourceDefinition: 
-        - xmlizable: 
-          - ↑classname: com.twinsoft.convertigo.beans.common.XMLVector
-          - com.twinsoft.convertigo.beans.common.XMLVector: 
-            - java.lang.String: 
-              - ↑value: 1601291368434
-            - java.lang.String: 
-              - ↑value: ./output/text()
-    ↓pwaAssetGenerator1 [steps.XMLElementStep-1603209013252]: 
-      nodeName: error
-      sourceDefinition: 
-        - xmlizable: 
-          - ↑classname: com.twinsoft.convertigo.beans.common.XMLVector
-          - com.twinsoft.convertigo.beans.common.XMLVector: 
-            - java.lang.String: 
-              - ↑value: 1601291368434
-            - java.lang.String: 
-              - ↑value: ./error/text()
-↓Sequence_JSOverrideManifest [steps.SimpleStep-1603209442256]: 
-  comment: override manifest.json properties such as name etc...
-  expression: |
-    '// imports
-    var Path = use("java.nio.file.Path");
-    var Paths = use("java.nio.file.Paths");
-    var Files = use("java.nio.file.Files");
-    var StandardCharsets = use("java.nio.charset.StandardCharsets");
-    var String = use("java.lang.String");
-    // get file path
-    var filePath = 
-    	Paths.get(
-    				((target == undefined || target == "") ? projectPath + separator+"DisplayObjects"+separator+"mobile"+separator+"assets"+separator+"manifest.json" :
-    														 pwaPath + target + separator + "manifest.json"
-    				)
-    			);
-    // get charset utf8
-    var charset = StandardCharsets.UTF_8;
-    // get text as js string
-    var content = "" + new String(Files.readAllBytes(filePath), charset);
-    // parse string as JSON Object
-    var jsonManifest = JSON.parse(content);
-    
-    // override existing values with new ones if they are not empty
-    pwaName != "" ? jsonManifest["name"] = pwaName : null;
-    pwaShortName != "" ? jsonManifest["short_name"] = pwaShortName : null;
-    pwaBackgroundColor != "" ? jsonManifest["background_color"] = pwaBackgroundColor : null;
-    pwaThemeColor != "" ? jsonManifest["theme_color"] = pwaThemeColor : null;
-    target != "" ? jsonManifest["start_url"] = "./index.html"+ (queryParameters != "" ? "?" + queryParameters : ""): "";
-    jsonManifest["scope"] = ((target == undefined || target == "") ? "/convertigo/projects/" + projectName + "/DisplayObjects/mobile/" :
-    																 "/convertigo/projects/" + projectName + "/DisplayObjects/pwas/"+target+"/");
-    try {
-    	var others = JSON.parse(additionalParametersJSONObjectString);
-    	log.warning("additionalParametersJSONObjectString")
-    	log.warning(JSON.stringify(others));
-    	for (var i in others) {
-    		log.warning("i:" +i);
-    		if(["name", "short_name", "start_url", "display", "icons", "background_color", "theme_color", "scope"].indexOf(i) == -1){
-    			log.warning("others[i] :" +others[i]);
-    			others[i] != "" ? jsonManifest[i] = others[i] : null;
-    		}
-    		else{
-    			log.debug("additionalParametersJSONObjectString, key " + i + " is forbidden");
-    		}
-    		
-    	}
-    }
-    catch(e){
-    	log.warning("catched error"+ JSON.stringify(e));
-    }
-    // override content value with our new ones
-    content = new String(""+JSON.stringify(jsonManifest));
-    // rewrite file
-    Files.write(filePath, content.getBytes(charset));'
-↓jIf1 [steps.IfStep-1603297464493]: 
-  condition: target != undefined && target != ""
-  ↓Sequence_JSCreateSymlink [steps.SimpleStep-1603295752447]: 
+↓jIf [steps.IfStep-1612438658991]: 
+  condition: onlyReGenerateNGSW != "false"
+  ↓IfFileExistsThenElse1 [steps.IfFileExistThenElseStep-1603354922838]: 
+    comment: search if npm lib @angular/service-worker is already installed
+    condition: file + separator + "ngsw-config"
+    ↓jThen [steps.ThenStep-1603354924988]: 
+      ↓Sequence_JSLogNoNeededInstall [steps.SimpleStep-1603452924792]: 
+        expression: log.debug("@angular/service-worker@5.2.11 is already installed, no need to install again");
+    ↓jElse [steps.ElseStep-1603354924990]: 
+      ↓Sequence_JSInstallServiceWorker [steps.SimpleStep-1603452735717]: 
+        expression: |
+          // create command to install npm package  @angular/service-worker@5.2.11 if doesn't exist yet
+          var npmInstallBis = isWindows ?
+          		"cmd /C "+file + separator + "npm i -g @angular/service-worker@5.2.11"  :
+          			["bash","-c","PATH=" + file + ":$PATH npm i -g @angular/service-worker@5.2.11"];
+          log.debug("will execute following command to install @angular/service-worker@5.2.11 => \n "+ npmInstallBis);
+      ↓Process_execute1 [steps.ProcessExecStep-1603354805680]: 
+        commandLine: npmInstallBis
+  ↓IfFileExistsThenElse [steps.IfFileExistThenElseStep-1603273719750]: 
+    comment: search if npm lib pwa-asset-generator is already installed
+    condition: file + separator + "pwa-asset-generator"
+    ↓jThen [steps.ThenStep-1603273719752]: 
+      ↓Sequence_JSLogNoNeededInstall [steps.SimpleStep-1603452990036]: 
+        expression: log.debug("pwa-assets-generator is already installed, no need to install again");
+    ↓jElse [steps.ElseStep-1603273719754]: 
+      ↓Sequence_JSInstallPwaAssetsGenerator [steps.SimpleStep-1603453010744]: 
+        expression: |
+          // create command to install npm package pwa-asset-generator if doesn't exist yet
+          var npmInstall = isWindows ?
+          		"cmd /C "+file + separator + "npm i -g pwa-asset-generator"  :
+          			["bash","-c","PATH=" + file + ":$PATH npm i -g pwa-asset-generator"];
+          log.debug("will execute following command to install pwa-asset-generator => \n "+ npmInstall);
+      ↓Process_execute1 [steps.ProcessExecStep-1603269268181]: 
+        commandLine: npmInstall
+        output: true
+  ↓jIfThenElse [steps.IfThenElseStep-1604053867706]: 
+    condition: target != ""
+    ↓jThen [steps.ThenStep-1604053867708]: 
+      ↓Create_directory [steps.CreateDirectoryStep-1603207036703]: 
+        comment: create a dir for the target
+        destinationPath: pwaPath+target+separator+"pwa-assets"
+      ↓Duplicate_fileIndexHTML [steps.DuplicateStep-1603204615018]: 
+        comment: duplicate index.html named with target name
+        copyName: '"index"+target+".html"'
+        overwrite: true
+        sourcePath: projectPath +separator+"DisplayObjects"+separator+"mobile"+separator+"index.html"
+      ↓Move_fileIndexHTML [steps.MoveStep-1603292524784]: 
+        comment: move file manifest to our new dir
+        destinationPath: pwaPath+target
+        overwrite: true
+        sourcePath: projectPath +separator+"DisplayObjects"+separator+"mobile"+separator+"index"+target+".html"
+      ↓Rename_fileIndexHTML [steps.RenameStep-1603292584762]: 
+        comment: rename index-targetName.html to index.html
+        newName: '"index.html"'
+        overwrite: true
+        sourcePath: pwaPath+target+separator+"index"+target+".html"
+      ↓Duplicate_fileManifest [steps.DuplicateStep-1603206186277]: 
+        comment: duplicate manifest.json named with target name
+        copyName: '"manifest-"+target+".json"'
+        overwrite: true
+        sourcePath: projectPath +separator+"DisplayObjects"+separator+"mobile"+separator+"assets"+separator+"manifest.json"
+      ↓Move_fileManifest [steps.MoveStep-1603207269396]: 
+        comment: move file manifest to our new dir
+        destinationPath: pwaPath+separator+target
+        overwrite: true
+        sourcePath: projectPath +separator+ "DisplayObjects"+separator+"mobile"+separator+"assets"+separator+"manifest-"+target+".json"
+      ↓Rename_fileManifest [steps.RenameStep-1603292877386]: 
+        comment: rename manifest-targetName.json to manifest.json
+        newName: '"manifest.json"'
+        overwrite: true
+        sourcePath: pwaPath+target+separator+"manifest-"+target+".json"
+      ↓Duplicate_fileNGSWWORKER [steps.DuplicateStep-1603294005702]: 
+        comment: duplicate ngsw-worker.js named with target name
+        copyName: '"ngsw-worker-"+target+".js"'
+        overwrite: true
+        sourcePath: projectPath +separator+"DisplayObjects"+separator+"mobile"+separator+"ngsw-worker.js"
+      ↓Move_fileNGSWWORKER [steps.MoveStep-1603293049574]: 
+        comment: move file ngsw-worker to our new dir
+        destinationPath: pwaPath+target
+        overwrite: true
+        sourcePath: projectPath +separator+"DisplayObjects"+separator+"mobile"+separator+"ngsw-worker-"+target+".js"
+      ↓Rename_fileNGSWWORKER [steps.RenameStep-1603294146873]: 
+        comment: rename ngsw-worker-targetName.js to ngsw-worker.js
+        newName: '"ngsw-worker.js"'
+        overwrite: true
+        sourcePath: pwaPath+target+separator+"ngsw-worker-"+target+".js"
+      ↓Sequence_JSReplaceLinkForManifest [steps.SimpleStep-1603204926368]: 
+        comment: change link for our new manifest
+        expression: |
+          '// imports
+          var Path = use("java.nio.file.Path");
+          var Paths = use("java.nio.file.Paths");
+          var Files = use("java.nio.file.Files");
+          var StandardCharsets = use("java.nio.charset.StandardCharsets");
+          var String = use("java.lang.String");
+          // get file path
+          var filePath =  Paths.get(pwaPath+target+separator+"index.html");
+          // get charset utf8
+          var charset = StandardCharsets.UTF_8;
+          // get text as string
+          var content = new String(Files.readAllBytes(filePath), charset);
+          // replace new manifest name
+          content = content.replaceAll(''<link rel="manifest" href="assets/manifest.json">'', ''<link rel="manifest" href="./manifest.json">'');
+          try{
+          		log.warning("tgere");
+          		log.warning(pwaName);
+          		// replace title
+          		var regexTitle = "<title>.*<\/title>";
+          		content = content.replaceAll(regexTitle, "<title>"+pwaName+"</title>");
+          		// replace icon
+          		var regexIcn = ''<link rel="icon" type=".*" href=".*">''
+          		content = content.replaceAll(regexIcn, ''<link rel="icon" type="image/png" href="pwa-assets/manifest-icon-192.png"/>'');
+          		// replace theme-color
+          		var regexTheme = ''<meta name="theme-color" content=".*">'';
+          		content = content.replaceAll(regexTheme, ''<meta name="theme-color" content="''+pwaThemeColor+''">'');
+          		log.warning(JSON.stringify(""+content));
+          }
+          catch(e){
+          	log.warning("error index");
+          	log.warning(JSON.stringify(e));
+          }
+          
+          
+          Files.write(filePath, content.getBytes(charset));'
+    ↓jElse [steps.ElseStep-1604053867710]: 
+      ↓Sequence_JSReplaceLinkForManifest [steps.SimpleStep-1604053875571]: 
+        comment: change link for our new manifest
+        expression: |
+          '// imports
+          var Path = use("java.nio.file.Path");
+          var Paths = use("java.nio.file.Paths");
+          var Files = use("java.nio.file.Files");
+          var StandardCharsets = use("java.nio.charset.StandardCharsets");
+          var String = use("java.lang.String");
+          // get file path
+          var filePath =  Paths.get(projectPath+separator+"DisplayObjects"+separator+"mobile"+separator+"index.html");
+          // get charset utf8
+          var charset = StandardCharsets.UTF_8;
+          // get text as string
+          var content = new String(Files.readAllBytes(filePath), charset);
+          try{
+          		log.warning("tgere");
+          		log.warning(pwaName);
+          		// replace title
+          		var regexTitle = "<title>.*<\/title>";
+          		content = content.replaceAll(regexTitle, "<title>"+pwaName+"</title>");
+          		// replace icon
+          		var regexIcn = ''<link rel="icon" type=".*" href=".*">''
+          		content = content.replaceAll(regexIcn, ''<link rel="icon" type="image/png" href="pwa-assets/manifest-icon-192.png"/>'');
+          		// replace theme-color
+          		var regexTheme = ''<meta name="theme-color" content=".*">'';
+          		content = content.replaceAll(regexTheme, ''<meta name="theme-color" content="''+pwaThemeColor+''">'');
+          		log.warning(JSON.stringify(""+content));
+          }
+          catch(e){
+          	log.warning("error index");
+          	log.warning(JSON.stringify(e));
+          }
+          
+          
+          Files.write(filePath, content.getBytes(charset));'
+  ↓computeCommandLine [steps.SimpleStep-1601370249246]: 
+    comment: prepare args for pwa-assets-generator
     expression: |
-      '//todo
+      'try{
+      	var s = " ";
+      	if(scrape != "true"){
+      		s = " -s false ";
+      	}
+      	
+      	jIndex    = ((target == undefined || target == "" ) ? projectPath + separator+"DisplayObjects"+separator+"mobile"+separator+"index"+".html" :
+      														  pwaPath + target + separator + "index" + ".html");
+      	jManifest = ((target == undefined || target == "" ) ? projectPath + separator+"DisplayObjects"+separator+"mobile"+separator+"assets"+separator+"manifest.json" :
+      														  pwaPath + target + separator + "manifest.json");
+      	jDest     = ((target == undefined || target == "") ?  projectPath + separator + "DisplayObjects" + separator + "mobile" + separator + "assets" :
+      														  pwaPath + target + separator + "pwa-assets");
+      	jLogo     = image + "";
+      	var jCmd = isWindows ? 
+      			"cmd /C " +file+separator+"pwa-asset-generator " + jLogo + " -i " + jIndex + " -m " + jManifest + s + jDest:
+      			["bash", "-c", "time PATH=" + file + ":$PATH pwa-asset-generator " + jLogo + " -i " + jIndex + " -m " + jManifest + s + jDest]
+      	
+      	
+      	log.debug("will execute following command to execute pwa-asset-generator => \n "+ jCmd);
+      }
+      catch(e){
+      	log.warning("pwa-asset-generator an error occured while trying to generate assets");
+      	log.warning(e);
+      }
+      
+      
+      '
+    output: true
+  ↓Process_execute [steps.ProcessExecStep-1601291368434]: 
+    commandLine: jCmd
+    comment: execute pwa-assets-generator
+    executionDirectory: .//assets
+    output: true
+  ↓Complex [steps.XMLComplexStep-1603208858186]: 
+    nodeName: status
+    ↓Complex [steps.XMLComplexStep-1603208980630]: 
+      nodeName: pwa-asset-generator
+      ↓pwaAssetGenerator2 [steps.XMLElementStep-1603209014151]: 
+        nodeName: exit-status
+        sourceDefinition: 
+          - xmlizable: 
+            - ↑classname: com.twinsoft.convertigo.beans.common.XMLVector
+            - com.twinsoft.convertigo.beans.common.XMLVector: 
+              - java.lang.String: 
+                - ↑value: 1601291368434
+              - java.lang.String: 
+                - ↑value: ./exit/text()
+      ↓pwaAssetGenerator [steps.XMLElementStep-1603208913543]: 
+        nodeName: output
+        sourceDefinition: 
+          - xmlizable: 
+            - ↑classname: com.twinsoft.convertigo.beans.common.XMLVector
+            - com.twinsoft.convertigo.beans.common.XMLVector: 
+              - java.lang.String: 
+                - ↑value: 1601291368434
+              - java.lang.String: 
+                - ↑value: ./output/text()
+      ↓pwaAssetGenerator1 [steps.XMLElementStep-1603209013252]: 
+        nodeName: error
+        sourceDefinition: 
+          - xmlizable: 
+            - ↑classname: com.twinsoft.convertigo.beans.common.XMLVector
+            - com.twinsoft.convertigo.beans.common.XMLVector: 
+              - java.lang.String: 
+                - ↑value: 1601291368434
+              - java.lang.String: 
+                - ↑value: ./error/text()
+  ↓Sequence_JSOverrideManifest [steps.SimpleStep-1603209442256]: 
+    comment: override manifest.json properties such as name etc...
+    expression: |
+      '// imports
+      var Path = use("java.nio.file.Path");
+      var Paths = use("java.nio.file.Paths");
+      var Files = use("java.nio.file.Files");
+      var StandardCharsets = use("java.nio.charset.StandardCharsets");
+      var String = use("java.lang.String");
+      // get file path
+      var filePath = 
+      	Paths.get(
+      				((target == undefined || target == "") ? projectPath + separator+"DisplayObjects"+separator+"mobile"+separator+"assets"+separator+"manifest.json" :
+      														 pwaPath + target + separator + "manifest.json"
+      				)
+      			);
+      // get charset utf8
+      var charset = StandardCharsets.UTF_8;
+      // get text as js string
+      var content = "" + new String(Files.readAllBytes(filePath), charset);
+      // parse string as JSON Object
+      var jsonManifest = JSON.parse(content);
+      
+      // override existing values with new ones if they are not empty
+      pwaName != "" ? jsonManifest["name"] = pwaName : null;
+      pwaShortName != "" ? jsonManifest["short_name"] = pwaShortName : null;
+      pwaBackgroundColor != "" ? jsonManifest["background_color"] = pwaBackgroundColor : null;
+      pwaThemeColor != "" ? jsonManifest["theme_color"] = pwaThemeColor : null;
+      target != "" ? jsonManifest["start_url"] = "./index.html"+ (queryParameters != "" ? "?" + queryParameters : ""): "";
+      jsonManifest["scope"] = ((target == undefined || target == "") ? "/convertigo/projects/" + projectName + "/DisplayObjects/mobile/" :
+      																 "/convertigo/projects/" + projectName + "/DisplayObjects/pwas/"+target+"/");
       try {
-      	if(target != undefined && target != ""){
-      		var mobilePath = projectPath + separator+"DisplayObjects"+separator+"mobile"+separator;
-      		var cmdSymLink = isWindows ?
-      				"cmd /C mklink /D "+pwaPath+target+separator+"assets " + mobilePath + "assets && mklink /D "+pwaPath+target+separator+"build " + mobilePath + "build":
-      				["bash", "-c" ,"ln -sfn " + mobilePath + "assets " + pwaPath+target+separator+"assets && ln -sfn " + mobilePath + "build " + pwaPath+target+separator+"build"];	
-      		log.debug("will execute following command to create symlinks => \n "+ cmdSymLink);
+      	var others = JSON.parse(additionalParametersJSONObjectString);
+      	log.warning("additionalParametersJSONObjectString")
+      	log.warning(JSON.stringify(others));
+      	for (var i in others) {
+      		log.warning("i:" +i);
+      		if(["name", "short_name", "start_url", "display", "icons", "background_color", "theme_color", "scope"].indexOf(i) == -1){
+      			log.warning("others[i] :" +others[i]);
+      			others[i] != "" ? jsonManifest[i] = others[i] : null;
+      		}
+      		else{
+      			log.debug("additionalParametersJSONObjectString, key " + i + " is forbidden");
+      		}
+      		
       	}
       }
       catch(e){
-      	log.warning("error creating symlinks");
-      	log.warning(""+e);
-      }'
-    output: true
-  ↓Process_execute [steps.ProcessExecStep-1603297502894]: 
-    commandLine: cmdSymLink
-    output: true
+      	log.warning("catched error"+ JSON.stringify(e));
+      }
+      // override content value with our new ones
+      content = new String(""+JSON.stringify(jsonManifest));
+      // rewrite file
+      Files.write(filePath, content.getBytes(charset));'
+  ↓jIf1 [steps.IfStep-1603297464493]: 
+    condition: target != undefined && target != ""
+    ↓Sequence_JSCreateSymlink [steps.SimpleStep-1603295752447]: 
+      expression: |
+        '//todo
+        try {
+        	if(target != undefined && target != ""){
+        		var mobilePath = projectPath + separator+"DisplayObjects"+separator+"mobile"+separator;
+        		var cmdSymLink = isWindows ?
+        				"cmd /C mklink /D "+pwaPath+target+separator+"assets " + mobilePath + "assets && mklink /D "+pwaPath+target+separator+"build " + mobilePath + "build":
+        				["bash", "-c" ,"ln -sfn " + mobilePath + "assets " + pwaPath+target+separator+"assets && ln -sfn " + mobilePath + "build " + pwaPath+target+separator+"build"];	
+        		log.debug("will execute following command to create symlinks => \n "+ cmdSymLink);
+        	}
+        }
+        catch(e){
+        	log.warning("error creating symlinks");
+        	log.warning(""+e);
+        }'
+      output: true
+    ↓Process_execute [steps.ProcessExecStep-1603297502894]: 
+      commandLine: cmdSymLink
+      output: true
 ↓Sequence_JSFindNgswconfigPath [steps.SimpleStep-1603366228196]: 
   expression: |
     '//imports
@@ -401,4 +403,6 @@ responseTimeout: 600
   value: 
 ↓scrape [variables.RequestableVariable-1611739766791]: 
   comment: 'Scraping Apple Human Interface guidelines to fetch splash screen specs  [default: "false"]'
+  value: false
+↓onlyReGenerateNGSW [variables.RequestableVariable-1612438512150]: 
   value: false
