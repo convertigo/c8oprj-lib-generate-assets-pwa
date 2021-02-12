@@ -62,7 +62,7 @@ responseTimeout: 600
           // create command to install npm package pwa-asset-generator if doesn't exist yet
           var npmInstall = isWindows ?
           		"cmd /C "+file + separator + "npm i -g pwa-asset-generator"  :
-          			["bash","-c","PATH=" + file + ":$PATH npm i -g pwa-asset-generator"];
+          			["bash","-c","PATH=" + file + ":$PATH npm i -g pwa-asset-generator@4.1.1"];
           log.debug("will execute following command to install pwa-asset-generator => \n "+ npmInstall);
       ↓Process_execute1 [steps.ProcessExecStep-1603269268181]: 
         commandLine: npmInstall
@@ -206,8 +206,8 @@ responseTimeout: 600
       														  pwaPath + target + separator + "pwa-assets");
       	jLogo     = image + "";
       	var jCmd = isWindows ? 
-      			"cmd /C " +file+separator+"pwa-asset-generator " + jLogo + " -i " + jIndex + " -m " + jManifest + s + jDest:
-      			["bash", "-c", "time PATH=" + file + ":$PATH pwa-asset-generator " + jLogo + " -i " + jIndex + " -m " + jManifest + s + jDest]
+      			"cmd /C " +file+separator+"pwa-asset-generator " + jLogo + " -i " + jIndex + " -m " + jManifest + s + " --opaque false --quality 100 --padding 0% " + jDest:
+      			["bash", "-c", "time PATH=" + file + ":$PATH pwa-asset-generator " + jLogo + " -i " + jIndex + " -m " + jManifest + s + "--disable-dev-shm-usage --opaque false --quality 100 --padding 0% " +jDest]
       	
       	
       	log.debug("will execute following command to execute pwa-asset-generator => \n "+ jCmd);
