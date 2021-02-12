@@ -207,7 +207,7 @@ responseTimeout: 600
       	jLogo     = image + "";
       	var jCmd = isWindows ? 
       			"cmd /C " +file+separator+"pwa-asset-generator " + jLogo + " -i " + jIndex + " -m " + jManifest + s + " --opaque false --quality 100 --padding 0% " + jDest:
-      			["bash", "-c", "time PATH=" + file + ":$PATH pwa-asset-generator " + jLogo + " -i " + jIndex + " -m " + jManifest + s + "--disable-dev-shm-usage --opaque false --quality 100 --padding 0% " +jDest]
+      			["bash", "-c", "time PATH=" + file + ":$PATH pwa-asset-generator " + jLogo + " -i " + jIndex + " -m " + jManifest + s + "--opaque false --quality 100 --padding 0% " +jDest]
       	
       	
       	log.debug("will execute following command to execute pwa-asset-generator => \n "+ jCmd);
