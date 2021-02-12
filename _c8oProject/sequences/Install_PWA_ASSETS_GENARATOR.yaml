@@ -1,3 +1,4 @@
+responseTimeout: 600
 ↓defineSeparatorSwitchOSAndDownlaodNode [steps.SimpleStep-1613127360343]: 
   expression: |
     '//Register time Start
@@ -25,7 +26,7 @@
   expression: |
     '// If we are in docker env
     if(java.lang.System.getenv("CONVERTIGO_GPG_KEYS") != null){
-    	var aptInstall = ["bash","-c","sudo apt-get install libgtk-3-0 libdrm-dev libnss3-tools libgbm-dev libasound2 libx11-dev libx11-xcb-dev libxcb-dri3-0"];
+    	var aptInstall = ["bash","-c","sudo apt-get update -y && sudo apt-get install libgtk-3-0 libdrm-dev libnss3-tools libgbm-dev libasound2 libx11-dev libx11-xcb-dev libxcb-dri3-0 -y"];
     }'
 ↓Process_execute11 [steps.ProcessExecStep-1613127867274]: 
   commandLine: aptInstall
