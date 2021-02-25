@@ -342,7 +342,7 @@ responseTimeout: 600
     
     var tplProjectName = com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName(projectName).mobileApplication.getApplicationComponent().getTplProjectName();
     var tplProjectPath = com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName(tplProjectName).getDirPath();
-    var tplNgwwConfigJsonPath = tplProjectPath + separator + "ionicTpl" + separator + "src" + separator + "ngsw-config.json"
+    var tplNgwwConfigJsonPath = tplProjectPath + separator + "ionicTpl" + separator + "src" + separator + "ngsw-config-sub-pwa.json"
     log.warn("founded tpl project name: " +tplProjectName);
     log.warn("founded tpl project path: " +tplProjectPath);
     log.warn("supposed ngsw-config path is : " +tplNgwwConfigJsonPath);
@@ -413,3 +413,5 @@ responseTimeout: 600
   value: false
 ↓onlyReGenerateNGSW [variables.RequestableVariable-1612438512150]: 
   value: false
+↓ngswFileName [variables.RequestableVariable-1614187931294]: 
+  value: ngsw-config.json
