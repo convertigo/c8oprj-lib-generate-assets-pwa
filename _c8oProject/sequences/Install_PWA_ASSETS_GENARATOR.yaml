@@ -11,6 +11,7 @@ responseTimeout: 600
     var file = com.twinsoft.convertigo.engine.util.ProcessUtils.getNodeDir("v10.19.0");
     // if unix, search into another path (node/bin)
     if(!isWindows && !file.getName().equals("bin")){
+    	
     	file = new java.io.File(file, "bin");
     }
     
@@ -22,11 +23,33 @@ responseTimeout: 600
 ↓Process_execute1 [steps.ProcessExecStep-1613127491467]: 
   commandLine: npmInstall
   output: true
+↓SedPwaAssetGeneraroe [steps.SimpleStep-1615900905989]: 
+  expression: |
+    '// command to fix missing --disable-dev-shm-usage command in pwa-asset-generator. (see https://github.com/onderceylan/pwa-asset-generator/issues/517)
+    var sedCommand = null;
+    if(java.lang.System.getenv("CONVERTIGO_GPG_KEYS") != null){
+    	var fileSed;
+    	if(file.getName().equals("bin")){
+    		fileSed = (""+file).substring(0, (""+file).length -4)
+    	}
+    	else{
+    		fileSed = ""+file;
+    	}
+    	sedCommand = ["bash","-c","sed -i \"s/''--log-level=3'',/''--log-level=3'',''--disable-dev-shm-usage'',/g\" "+ fileSed + "/lib/node_modules/pwa-asset-generator/dist/config/constants.js"];
+    	log.debug("will execute following command to install perform sed on pwa-asset-generator => \n "+ sedCommand);
+    }
+    
+    // workspace/nodes/node-v10.19.0-linux-x64/lib/node_modules/pwa-asset-generator/dist/config/constants.js'
+↓jIf [steps.IfStep-1615901090515]: 
+  condition: sedCommand != null
+  ↓Process_execute12 [steps.ProcessExecStep-1615900936478]: 
+    commandLine: sedCommand
+    output: true
 ↓CheckDependenciesDocker [steps.SimpleStep-1613127576764]: 
   expression: |
     '// If we are in docker env
     if(java.lang.System.getenv("CONVERTIGO_GPG_KEYS") != null){
-    	var aptInstall = ["bash","-c","sudo apt-get update -y && sudo apt-get install libgtk-3-0 libdrm-dev libnss3-tools libgbm-dev libasound2 libx11-dev libx11-xcb-dev libxcb-dri3-0 -y"];
+    	var aptInstall = ["bash","-c","sudo apt-get update -y && sudo apt-get install libgtk-3-0 libdrm-dev libnss3-tools libgbm-dev libasound2 libx11-dev libx11-xcb-dev libxcb-dri3-0 libxshmfence-dev -y"];
     }'
 ↓Process_execute11 [steps.ProcessExecStep-1613127867274]: 
   commandLine: aptInstall

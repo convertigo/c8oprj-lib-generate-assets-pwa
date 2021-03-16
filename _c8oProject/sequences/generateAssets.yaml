@@ -390,7 +390,17 @@ responseTimeout: 600
     '//Register time end
     var timeEnd = new Date().getTime();
     
-    log.debug("Generate Assets sequence total time is: " +((timeEnd - timeStart) / 1000) + " seconds");'
+    log.debug("Generate Assets sequence total time is: " +((timeEnd - timeStart) / 1000) + " seconds");
+    var pkillChrome = null;
+    if(java.lang.System.getenv("CONVERTIGO_GPG_KEYS") != null){
+    	log.debug("CONVERTIGO_GPG_KEYS detected, we are in docker and will kill any instance of chrome remaning");
+    	pkillChrome =  ["bash","-c","sudo pkill chrome"];
+    }'
+↓jIfPKILL [steps.IfStep-1615570152253]: 
+  condition: pkillChrome != null
+  ↓Process_execute1 [steps.ProcessExecStep-1615570169839]: 
+    commandLine: pkillChrome
+    output: true
 ↓image [variables.RequestableVariable-1601370133677]: 
   isFileUpload: true
 ↓projectName [variables.RequestableVariable-1601370157638]: 
