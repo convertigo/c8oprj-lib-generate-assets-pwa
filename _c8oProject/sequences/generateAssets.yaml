@@ -126,13 +126,13 @@ responseTimeout: 600
           var Paths = use("java.nio.file.Paths");
           var Files = use("java.nio.file.Files");
           var StandardCharsets = use("java.nio.charset.StandardCharsets");
-          var String = use("java.lang.String");
+          var JString = use("java.lang.String");
           // get file path
           var filePath =  Paths.get(pwaPath+target+separator+"index.html");
           // get charset utf8
           var charset = StandardCharsets.UTF_8;
           // get text as string
-          var content = new String(Files.readAllBytes(filePath), charset);
+          var content = new JString(Files.readAllBytes(filePath), charset);
           // replace new manifest name
           content = content.replaceAll(''<link rel="manifest" href="assets/manifest.json">'', ''<link rel="manifest" href="./manifest.json">'');
           try{
@@ -163,13 +163,13 @@ responseTimeout: 600
           var Paths = use("java.nio.file.Paths");
           var Files = use("java.nio.file.Files");
           var StandardCharsets = use("java.nio.charset.StandardCharsets");
-          var String = use("java.lang.String");
+          var JString = use("java.lang.String");
           // get file path
           var filePath =  Paths.get(projectPath+separator+"DisplayObjects"+separator+"mobile"+separator+"index.html");
           // get charset utf8
           var charset = StandardCharsets.UTF_8;
           // get text as string
-          var content = new String(Files.readAllBytes(filePath), charset);
+          var content = new JString(Files.readAllBytes(filePath), charset);
           try{
           		// replace title
           		var regexTitle = "<title>.*<\/title>";
@@ -267,7 +267,7 @@ responseTimeout: 600
       var Paths = use("java.nio.file.Paths");
       var Files = use("java.nio.file.Files");
       var StandardCharsets = use("java.nio.charset.StandardCharsets");
-      var String = use("java.lang.String");
+      var JString = use("java.lang.String");
       // get file path
       var filePath = 
       	Paths.get(
@@ -278,7 +278,7 @@ responseTimeout: 600
       // get charset utf8
       var charset = StandardCharsets.UTF_8;
       // get text as js string
-      var content = "" + new String(Files.readAllBytes(filePath), charset);
+      var content = "" + new JString(Files.readAllBytes(filePath), charset);
       // parse string as JSON Object
       var jsonManifest = JSON.parse(content);
       
@@ -310,7 +310,7 @@ responseTimeout: 600
       	log.warning("catched error"+ JSON.stringify(e));
       }
       // override content value with our new ones
-      content = new String(""+JSON.stringify(jsonManifest));
+      content = new JString(""+JSON.stringify(jsonManifest));
       // rewrite file
       Files.write(filePath, content.getBytes(charset));'
   ↓jIf1 [steps.IfStep-1603297464493]: 
