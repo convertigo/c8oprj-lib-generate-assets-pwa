@@ -1,0 +1,91 @@
+accessibility: Private
+↓makeFiles [steps.SimpleStep-1617961041954]: 
+  expression: |
+    'var FileUtils = use("com.twinsoft.convertigo.engine.util.FileUtils");
+    var Path      = use("java.nio.file.Path");
+    
+    var outputs = [];
+    
+    // IOS PART
+    var appleSplash = [
+    {"w": 1024, "h": 1366, "r": 2},
+    {"w": 834, "h": 1194, "r": 2},
+    {"w": 768, "h": 1024, "r": 2},
+    {"w": 834, "h": 1112, "r": 2},
+    {"w": 810, "h": 1080, "r": 2},
+    {"w": 428, "h": 926, "r": 3},
+    {"w": 390, "h": 844, "r": 3},
+    {"w": 375, "h": 812, "r": 3},
+    {"w": 414, "h": 896, "r": 3},
+    {"w": 414, "h": 896, "r": 2},
+    {"w": 414, "h": 736, "r": 3},
+    {"w": 375, "h": 667, "r": 2},
+    {"w": 320, "h": 568, "r": 2}];
+    
+    var indexFile = new java.io.File(index);
+    var prefix = indexFile.getParentFile().toPath().relativize(Path.of(destination)).toString().replace("\\", "/") + "/";
+    
+    function toHref(filename) {
+    	outputs.push(filename);
+    	return ''href="'' + prefix + filename + ''"'';
+    }
+    
+    var indexHTML = FileUtils.readFileToString(indexFile, "UTF-8");
+    indexHTML = indexHTML.replaceAll(''.*<link rel="apple-touch-.*\r?\n'', '''');
+    indexHTML = indexHTML.replaceAll(''.*<meta name="apple-mobile-web-app-capable.*\r?\n'', '''');
+    
+    var appleIndex = ''<link rel="apple-touch-icon" '' + toHref("apple-icon-180.png") + ''>\n'';
+    appleIndex += ''<meta name="apple-mobile-web-app-capable" content="yes">\n'';
+    for (k in appleSplash) {
+    	var s = appleSplash[k];
+    	appleIndex += ''<link rel="apple-touch-startup-image" '' + toHref("apple-splash-" + (s.w * s.r) + "-" + (s.h * s.r) + ".jpg") + '' media="(device-width: '' + s.w + ''px) and (device-height: '' + s.h + ''px) and (-webkit-device-pixel-ratio: '' + s.r +'') and (orientation: portrait)">\n'';
+    	appleIndex += ''<link rel="apple-touch-startup-image" '' + toHref("apple-splash-" + (s.h * s.r) + "-" + (s.w * s.r) + ".jpg") + '' media="(device-width: '' + s.w + ''px) and (device-height: '' + s.h + ''px) and (-webkit-device-pixel-ratio: '' + s.r +'') and (orientation: landscape)">\n'';
+    }
+    
+    indexHTML = indexHTML.replace("<head>", appleIndex + "\n<head>");
+    
+    FileUtils.writeStringToFile(indexFile, indexHTML, "UTF-8");
+    
+    // ANDROID PART
+    
+    var manifestFile = new java.io.File(manifest);
+    var manifestText = FileUtils.readFileToString(manifestFile, "UTF-8");
+    var manifestJSON = JSON.parse(manifestText);
+    manifestJSON.background_color = background;
+    manifestJSON.theme_color = theme;
+    
+    prefix = manifestFile.getParentFile().toPath().relativize(Path.of(destination)).toString().replace("\\", "/") + "/";
+    var icons = [];
+    
+    function toIcons(size) {
+    	var filename = "manifest-icon-" + size + ".png";
+    	outputs.push(filename);
+    	var icon = {
+          "src": prefix + filename,
+          "sizes": size + "x" + size,
+          "type": "image/png",
+          "purpose": "maskable any"
+        };
+    	icons.push(icon);
+    }
+    
+    toIcons(192);
+    toIcons(512);
+    
+    manifestJSON.icons = icons;
+    FileUtils.writeStringToFile(manifestFile, JSON.stringify(manifestJSON, null, 2), "UTF-8");
+    '
+↓Call_Sequence [steps.SequenceStep-1618220361286]: 
+  sourceSequence: lib_GeneratePWAAssets.MakeImages
+  ↓logo [variables.StepVariable-1618220361288]: 
+  ↓destination [variables.StepVariable-1618220361290]: 
+  ↓background [variables.StepVariable-1618220361292]: 
+  ↓outputs [variables.StepMultiValuedVariable-1618220361294]: 
+↓logo [variables.RequestableVariable-1617973019025]: 
+↓index [variables.RequestableVariable-1617973029207]: 
+↓manifest [variables.RequestableVariable-1617973039545]: 
+↓destination [variables.RequestableVariable-1617973060924]: 
+↓background [variables.RequestableVariable-1618220150327]: 
+  value: '#ffffff'
+↓theme [variables.RequestableVariable-1618220231100]: 
+  value: '#ffffff'

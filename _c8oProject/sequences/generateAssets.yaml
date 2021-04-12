@@ -198,13 +198,16 @@ responseTimeout: 600
       		s = " -s false ";
       	}
       	
-      	jIndex    = ((target == undefined || target == "" ) ? projectPath + separator+"DisplayObjects"+separator+"mobile"+separator+"index"+".html" :
+      	index = jIndex = ((target == undefined || target == "" ) ? projectPath + separator+"DisplayObjects"+separator+"mobile"+separator+"index"+".html" :
       														  pwaPath + target + separator + "index" + ".html");
-      	jManifest = ((target == undefined || target == "" ) ? projectPath + separator+"DisplayObjects"+separator+"mobile"+separator+"assets"+separator+"manifest.json" :
+      	manifest = jManifest = ((target == undefined || target == "" ) ? projectPath + separator+"DisplayObjects"+separator+"mobile"+separator+"assets"+separator+"manifest.json" :
       														  pwaPath + target + separator + "manifest.json");
-      	jDest     = ((target == undefined || target == "") ?  projectPath + separator + "DisplayObjects" + separator + "mobile" + separator + "assets" :
+      	destination = jDest = ((target == undefined || target == "") ?  projectPath + separator + "DisplayObjects" + separator + "mobile" + separator + "assets" :
       														  pwaPath + target + separator + "pwa-assets");
-      	jLogo     = image + "";
+      	logo = jLogo     = image + "";
+      	
+      	background = pwaBackgroundColor;
+      	theme = pwaThemeColor;
       	var jCmd = isWindows ? 
       			"cmd /C " +file+separator+"pwa-asset-generator " + jLogo + " -i " + jIndex + " -m " + jManifest + s + " --opaque false --quality 100 --padding 0% " + jDest:
       			["bash", "-c", "time PATH=" + file + ":$PATH pwa-asset-generator " + jLogo + " -i " + jIndex + " -m " + jManifest + s + "--opaque false --quality 100 --padding 0% " +jDest]
@@ -224,8 +227,20 @@ responseTimeout: 600
     commandLine: jCmd
     comment: execute pwa-assets-generator
     executionDirectory: .//assets
+    isEnabled: false
     output: true
+  ↓Call_Sequence [steps.SequenceStep-1618233186910]: 
+    sourceSequence: lib_GeneratePWAAssets.PwaAssetGenerator
+    ↓logo [variables.StepVariable-1618233186912]: 
+    ↓index [variables.StepVariable-1618233186914]: 
+    ↓manifest [variables.StepVariable-1618233186916]: 
+    ↓destination [variables.StepVariable-1618233186918]: 
+    ↓background [variables.StepVariable-1618233186920]: 
+      value: '#ffffff'
+    ↓theme [variables.StepVariable-1618233186922]: 
+      value: '#ffffff'
   ↓Complex [steps.XMLComplexStep-1603208858186]: 
+    isEnabled: false
     nodeName: status
     ↓Complex [steps.XMLComplexStep-1603208980630]: 
       nodeName: pwa-asset-generator
@@ -425,3 +440,26 @@ responseTimeout: 600
   value: false
 ↓ngswFileName [variables.RequestableVariable-1614187931294]: 
   value: ngsw-config.json
+↓Test_Case [core.TestCase]: 
+  ↓image [variables.TestCaseVariable-1617963549027]: 
+  ↓projectName [variables.TestCaseVariable-1617963549029]: 
+  ↓target [variables.TestCaseVariable-1617963549031]: 
+    value: 
+  ↓pwaName [variables.TestCaseVariable-1617963549033]: 
+    value: 
+  ↓pwaShortName [variables.TestCaseVariable-1617963549035]: 
+    value: 
+  ↓pwaBackgroundColor [variables.TestCaseVariable-1617963549037]: 
+    value: 
+  ↓pwaThemeColor [variables.TestCaseVariable-1617963549039]: 
+    value: 
+  ↓additionalParametersJSONObjectString [variables.TestCaseVariable-1617963549041]: 
+    value: '{}'
+  ↓queryParameters [variables.TestCaseVariable-1617963549043]: 
+    value: 
+  ↓scrape [variables.TestCaseVariable-1617963549045]: 
+    value: false
+  ↓onlyReGenerateNGSW [variables.TestCaseVariable-1617963549047]: 
+    value: false
+  ↓ngswFileName [variables.TestCaseVariable-1617963549049]: 
+    value: ngsw-config.json
