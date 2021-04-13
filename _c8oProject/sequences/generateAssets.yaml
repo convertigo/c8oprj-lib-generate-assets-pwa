@@ -189,15 +189,11 @@ responseTimeout: 600
           
           
           Files.write(filePath, content.getBytes(charset));'
-  ↓computeCommandLine [steps.SimpleStep-1601370249246]: 
+  ↓computeParameters [steps.SimpleStep-1601370249246]: 
     comment: prepare args for pwa-assets-generator
     expression: |
-      'try{
-      	var s = " ";
-      	if(scrape != "true"){
-      		s = " -s false ";
-      	}
-      	
+      '// define parameters before calling sequence pwaAssetGenerator sequence
+      try{
       	index = jIndex = ((target == undefined || target == "" ) ? projectPath + separator+"DisplayObjects"+separator+"mobile"+separator+"index"+".html" :
       														  pwaPath + target + separator + "index" + ".html");
       	manifest = jManifest = ((target == undefined || target == "" ) ? projectPath + separator+"DisplayObjects"+separator+"mobile"+separator+"assets"+separator+"manifest.json" :
@@ -205,29 +201,15 @@ responseTimeout: 600
       	destination = jDest = ((target == undefined || target == "") ?  projectPath + separator + "DisplayObjects" + separator + "mobile" + separator + "assets" :
       														  pwaPath + target + separator + "pwa-assets");
       	logo = jLogo     = image + "";
-      	
       	background = pwaBackgroundColor;
       	theme = pwaThemeColor;
-      	var jCmd = isWindows ? 
-      			"cmd /C " +file+separator+"pwa-asset-generator " + jLogo + " -i " + jIndex + " -m " + jManifest + s + " --opaque false --quality 100 --padding 0% " + jDest:
-      			["bash", "-c", "time PATH=" + file + ":$PATH pwa-asset-generator " + jLogo + " -i " + jIndex + " -m " + jManifest + s + "--opaque false --quality 100 --padding 0% " +jDest]
-      	
-      	
-      	log.debug("will execute following command to execute pwa-asset-generator => \n "+ jCmd);
       }
       catch(e){
-      	log.warning("pwa-asset-generator an error occured while trying to generate assets");
-      	log.warning(e);
+      		log.error("An error occured while computing parameters for pwaAssetGenerator sequence:\n" + JSON.stringify(e))
       }
       
       
       '
-    output: true
-  ↓Process_execute [steps.ProcessExecStep-1601291368434]: 
-    commandLine: jCmd
-    comment: execute pwa-assets-generator
-    executionDirectory: .//assets
-    isEnabled: false
     output: true
   ↓Call_Sequence [steps.SequenceStep-1618233186910]: 
     sourceSequence: lib_GeneratePWAAssets.PwaAssetGenerator
@@ -239,41 +221,6 @@ responseTimeout: 600
       value: '#ffffff'
     ↓theme [variables.StepVariable-1618233186922]: 
       value: '#ffffff'
-  ↓Complex [steps.XMLComplexStep-1603208858186]: 
-    isEnabled: false
-    nodeName: status
-    ↓Complex [steps.XMLComplexStep-1603208980630]: 
-      nodeName: pwa-asset-generator
-      ↓pwaAssetGenerator2 [steps.XMLElementStep-1603209014151]: 
-        nodeName: exit-status
-        sourceDefinition: 
-          - xmlizable: 
-            - ↑classname: com.twinsoft.convertigo.beans.common.XMLVector
-            - com.twinsoft.convertigo.beans.common.XMLVector: 
-              - java.lang.String: 
-                - ↑value: 1601291368434
-              - java.lang.String: 
-                - ↑value: ./exit/text()
-      ↓pwaAssetGenerator [steps.XMLElementStep-1603208913543]: 
-        nodeName: output
-        sourceDefinition: 
-          - xmlizable: 
-            - ↑classname: com.twinsoft.convertigo.beans.common.XMLVector
-            - com.twinsoft.convertigo.beans.common.XMLVector: 
-              - java.lang.String: 
-                - ↑value: 1601291368434
-              - java.lang.String: 
-                - ↑value: ./output/text()
-      ↓pwaAssetGenerator1 [steps.XMLElementStep-1603209013252]: 
-        nodeName: error
-        sourceDefinition: 
-          - xmlizable: 
-            - ↑classname: com.twinsoft.convertigo.beans.common.XMLVector
-            - com.twinsoft.convertigo.beans.common.XMLVector: 
-              - java.lang.String: 
-                - ↑value: 1601291368434
-              - java.lang.String: 
-                - ↑value: ./error/text()
   ↓Sequence_JSOverrideManifest [steps.SimpleStep-1603209442256]: 
     comment: override manifest.json properties such as name etc...
     expression: |

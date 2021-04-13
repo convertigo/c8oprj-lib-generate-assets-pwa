@@ -1,4 +1,5 @@
 accessibility: Private
+responseTimeout: 600
 ↓makeImage [steps.SimpleStep-1618220080331]: 
   expression: |
     'var RenderingHints = use("java.awt.RenderingHints");
