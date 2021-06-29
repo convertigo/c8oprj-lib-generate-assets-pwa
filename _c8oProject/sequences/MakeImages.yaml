@@ -28,9 +28,14 @@ responseTimeout: 600
     	
     	var img = new java.awt.image.BufferedImage(w, h, java.awt.image.BufferedImage.TYPE_INT_RGB);
     	var g = img.createGraphics();
-    	g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    	g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-    	g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+    	try {
+    		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+    		g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+    	} catch (e) {
+    		// prevents exception with the JDK 16 and without the JVM parameter:
+    		// --add-exports=java.desktop/sun.java2d=ALL-UNNAMED
+    	}
     	g.setColor(background);
     	g.fillRect(0, 0, w, h);
     	var nW = Math.round(r > 1 ? h * logo_r : w);
