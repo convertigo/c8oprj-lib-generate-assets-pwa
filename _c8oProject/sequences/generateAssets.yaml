@@ -284,7 +284,7 @@ responseTimeout: 600
         	if(target != undefined && target != ""){
         		var mobilePath = projectPath + separator+"DisplayObjects"+separator+"mobile"+separator;
         		var cmdSymLink = isWindows ?
-        				"cmd /C mklink /D "+pwaPath+target+separator+"assets " + mobilePath + "assets && mklink /D "+pwaPath+target+separator+"build " + mobilePath + "build":
+        				"cmd /C mklink /j "+pwaPath+target+separator+"assets " + mobilePath + "assets && mklink /j "+pwaPath+target+separator+"build " + mobilePath + "build":
         				["bash", "-c" ,"ln -sfn " + mobilePath + "assets " + pwaPath+target+separator+"assets && ln -sfn " + mobilePath + "build " + pwaPath+target+separator+"build"];	
         		log.debug("will execute following command to create symlinks => \n "+ cmdSymLink);
         	}
