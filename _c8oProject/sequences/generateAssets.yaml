@@ -302,11 +302,10 @@ responseTimeout: 600
     '//imports
     var Paths = use("java.nio.file.Paths");
     
-    var tplProjectName = com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName(projectName).mobileApplication.getApplicationComponent().getTplProjectName();
-    var tplProjectPath = com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName(tplProjectName).getDirPath();
-    var tplNgwwConfigJsonPath = tplProjectPath + separator + "ionicTpl" + separator + "src" + separator + "ngsw-config-sub-pwa.json"
-    log.warn("founded tpl project name: " +tplProjectName);
-    log.warn("founded tpl project path: " +tplProjectPath);
+    //var tplProjectName = com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName(projectName).mobileApplication.getApplicationComponent().getTplProjectName();
+    var tplProjectPath = com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName(projectName).getDirPath();
+    var tplNgwwConfigJsonPath = tplProjectPath + separator + "ngswForPWA" + separator + "ngsw-config-sub-pwa.json"
+    //log.warn("founded tpl project name: " +tplProjectName);
     log.warn("supposed ngsw-config path is : " +tplNgwwConfigJsonPath);
     
     // get ngsw-config file in relative path
