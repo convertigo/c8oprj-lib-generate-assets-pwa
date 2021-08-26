@@ -10,7 +10,7 @@ responseTimeout: 600
     // Define separator switch os
     var separator = isWindows ? "\\" :"/";
     // Define current Project path
-    var projectPath = com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName(projectName).getDirPath();
+    var projectPath = com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName("C8Oforms").getDirPath();
     // download node 10 if doesn''t exists and give its path
     var file = com.twinsoft.convertigo.engine.util.ProcessUtils.getNodeDir("v10.19.0");
     // if unix, search into another path (node/bin)
@@ -18,7 +18,10 @@ responseTimeout: 600
     	file = new java.io.File(file, "bin");
     }
     // compute dir for pwas
-    var pwaPath = projectPath + separator +"DisplayObjects"+separator+"pwas"+separator;
+    var projectPath2 = com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName(projectName).getDirPath();
+    var pwaPath = projectPath2 + separator +"DisplayObjects"+separator+"pwas"+separator;
+    
+    
     log.debug("Sequence lib_GeneratePWAAssets.GenaratePwaAssets has been called");
     log.debug("We will generate pwa named "+pwaName+ (target != "" ? " with target: " + target : "with no target") +", "+ (onlyReGenerateNGSW == "false" ? "(Full re-generation)": ("Only re-generating ngsw")));
     log.debug("Generate Assets => \nUnix OS = "+isWindows+ " \nSeparator that will be used is: "+separator+" \nTargeted project path is: "+projectPath+" \nNode path is: "+file);'
@@ -303,16 +306,19 @@ responseTimeout: 600
     var Paths = use("java.nio.file.Paths");
     
     //var tplProjectName = com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName(projectName).mobileApplication.getApplicationComponent().getTplProjectName();
-    var tplProjectPath = com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName(projectName).getDirPath();
+    var tplProjectPath = com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName("C8Oforms").getDirPath();
     var tplNgwwConfigJsonPath = tplProjectPath + separator + "ngswForPWA" + separator + "ngsw-config-sub-pwa.json"
     //log.warn("founded tpl project name: " +tplProjectName);
     log.warn("supposed ngsw-config path is : " +tplNgwwConfigJsonPath);
     
     // get ngsw-config file in relative path
-    var sourceFile = Paths.get(projectPath);
+    var projectPath3 = com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName("pwas").getDirPath();
+    var sourceFile = Paths.get(projectPath3);
     var targetFile = Paths.get(tplNgwwConfigJsonPath);
     var tplNgwwConfigJsonRelativePath = sourceFile.relativize(targetFile); 
     log.warn("ngsw-config relative path is: " +tplNgwwConfigJsonPath);
+    
+    
     /*
     //C:\dev\convertigo_workspaces\workspace1\mobilebuilder_tpl_test\ionicTpl\src\ngsw-config.json
     
@@ -324,10 +330,9 @@ responseTimeout: 600
     			"cmd /C cd "+projectPath+" && "+file + separator + "ngsw-config .\\pwas\\"+target+ " "+ tplNgwwConfigJsonRelativePath+ " /convertigo/projects/" + projectName +"/DisplayObjects/mobile/pwas/"+target+"/"  :
     			["bash","-c","cd " +projectPath+ "; PATH=" + file + ":$PATH ngsw-config ./DisplayObjects/mobile/pwas/"+target+ " "+ tplNgwwConfigJsonRelativePath+ " /convertigo/projects/" + projectName +"/DisplayObjects/mobile/pwas/"+target+"/"];
     			*/
-    
     if(isWindows){
     	if(target != undefined || target != ""){
-    		var npmCmd = "cmd /C cd "+projectPath+" && "+file + separator + "ngsw-config .\\DisplayObjects\\pwas\\"+target+ " "+ tplNgwwConfigJsonRelativePath+ " /convertigo/projects/" + projectName +"/DisplayObjects/pwas/"+target+"/" 
+    		var npmCmd = "cmd /C cd "+projectPath3+" && "+file + separator + "ngsw-config .\\DisplayObjects\\pwas\\"+  target+ " "+ tplNgwwConfigJsonRelativePath+ " /convertigo/projects/pwas/DisplayObjects/pwas/"+target+"/" 
     	}
     	else{
     		var npmCmd = "cmd /C cd "+projectPath+" && "+file + separator + "ngsw-config .\\DisplayObjects\\mobile "+ tplNgwwConfigJsonRelativePath+ " /convertigo/projects/" + projectName +"/DisplayObjects/mobile/" 
@@ -335,7 +340,7 @@ responseTimeout: 600
     }
     else{
     	if(target != undefined || target != ""){
-    		var npmCmd = ["bash","-c","cd " +projectPath+ "; PATH=" + file + ":$PATH ngsw-config ./DisplayObjects/pwas/"+target+ " "+ tplNgwwConfigJsonRelativePath+ " /convertigo/projects/" + projectName +"/DisplayObjects/pwas/"+target+"/"];
+    		var npmCmd = ["bash","-c","cd " +projectPath+ "; PATH=" + file + ":$PATH ngsw-config "+ pwaPath +target+ " "+ tplNgwwConfigJsonRelativePath+ " /convertigo/projects/" + projectName +"/DisplayObjects/pwas/"+target+"/"];
     	}
     	else{
     		var npmCmd = ["bash","-c","cd " +projectPath+ "; time PATH=" + file + ":$PATH ngsw-config ./DisplayObjects/mobile/ " + tplNgwwConfigJsonRelativePath+ " /convertigo/projects/" + projectName +"/DisplayObjects/mobile/"];
