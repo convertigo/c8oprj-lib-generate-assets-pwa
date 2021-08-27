@@ -254,7 +254,7 @@ responseTimeout: 600
       pwaThemeColor != "" ? jsonManifest["theme_color"] = pwaThemeColor : null;
       target != "" ? jsonManifest["start_url"] = "./index.html"+ (queryParameters != "" ? "?" + queryParameters : ""): "";
       jsonManifest["scope"] = ((target == undefined || target == "") ? "/convertigo/projects/" + projectName + "/DisplayObjects/mobile/" :
-      																 "/convertigo/projects/" + projectName + "/DisplayObjects/pwas/"+target+"/");
+      																 "/convertigo/projects/C8Oforms/DisplayObjects/pwas/"+target+"/");
       try {
       	var others = JSON.parse(additionalParametersJSONObjectString);
       	log.warning("additionalParametersJSONObjectString")
@@ -330,6 +330,7 @@ responseTimeout: 600
     			"cmd /C cd "+projectPath+" && "+file + separator + "ngsw-config .\\pwas\\"+target+ " "+ tplNgwwConfigJsonRelativePath+ " /convertigo/projects/" + projectName +"/DisplayObjects/mobile/pwas/"+target+"/"  :
     			["bash","-c","cd " +projectPath+ "; PATH=" + file + ":$PATH ngsw-config ./DisplayObjects/mobile/pwas/"+target+ " "+ tplNgwwConfigJsonRelativePath+ " /convertigo/projects/" + projectName +"/DisplayObjects/mobile/pwas/"+target+"/"];
     			*/
+    
     if(isWindows){
     	if(target != undefined || target != ""){
     		var npmCmd = "cmd /C cd "+projectPath3+" && "+file + separator + "ngsw-config .\\DisplayObjects\\pwas\\"+  target+ " "+ tplNgwwConfigJsonRelativePath+ " /convertigo/projects/C8Oforms/DisplayObjects/pwas/"+target+"/"; 
@@ -340,7 +341,7 @@ responseTimeout: 600
     }
     else{
     	if(target != undefined || target != ""){
-    		var npmCmd = ["bash","-c","cd " +projectPath+ "; PATH=" + file + ":$PATH ngsw-config ./DisplayObjects/pwas/" + target+ " "+ tplNgwwConfigJsonRelativePath+ " /convertigo/projects/C8Oforms/DisplayObjects/pwas/"+target+"/"];
+    		var npmCmd = ["bash","-c","cd " +projectPath3+ "; PATH=" + file + ":$PATH ngsw-config ./DisplayObjects/pwas/" + target+ " "+ tplNgwwConfigJsonRelativePath+ " /convertigo/projects/C8Oforms/DisplayObjects/pwas/"+target+"/"];
     	}
     	else{
     		var npmCmd = ["bash","-c","cd " +projectPath+ "; time PATH=" + file + ":$PATH ngsw-config ./DisplayObjects/mobile/ " + tplNgwwConfigJsonRelativePath+ " /convertigo/projects/" + projectName +"/DisplayObjects/mobile/"];
