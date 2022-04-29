@@ -12,7 +12,7 @@ responseTimeout: 600
     // Define current Project path
     var projectPath = com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName(projectName).getDirPath();
     // download node 10 if doesn''t exists and give its path
-    var file = com.twinsoft.convertigo.engine.util.ProcessUtils.getNodeDir("v10.19.0");
+    var file = com.twinsoft.convertigo.engine.util.ProcessUtils.getNodeDir("v16.13.1");
     // if unix, search into another path (node/bin)
     if(!isWindows && !file.getName().equals("bin")){
     	file = new java.io.File(file, "bin");
@@ -90,31 +90,34 @@ responseTimeout: 600
         sourcePath: pwaPath+target+separator+"index"+target+".html"
       ↓Duplicate_fileManifest [steps.DuplicateStep-1603206186277]: 
         comment: duplicate manifest.json named with target name
-        copyName: '"manifest-"+target+".json"'
+        copyName: '"manifest-"+target+".webmanifest"'
         overwrite: true
-        sourcePath: projectPath +separator+"DisplayObjects"+separator+"mobile"+separator+"assets"+separator+"manifest.json"
+        sourcePath: projectPath +separator+"DisplayObjects"+separator+"mobile"+separator + "manifest.webmanifest"
       ↓Move_fileManifest [steps.MoveStep-1603207269396]: 
         comment: move file manifest to our new dir
         destinationPath: pwaPath+separator+target
         overwrite: true
-        sourcePath: projectPath +separator+ "DisplayObjects"+separator+"mobile"+separator+"assets"+separator+"manifest-"+target+".json"
+        sourcePath: projectPath +separator+ "DisplayObjects"+separator+"mobile"+separator+"manifest-"+target+".webmanifest"
       ↓Rename_fileManifest [steps.RenameStep-1603292877386]: 
         comment: rename manifest-targetName.json to manifest.json
-        newName: '"manifest.json"'
+        newName: '"manifest.webmanifest"'
         overwrite: true
-        sourcePath: pwaPath+target+separator+"manifest-"+target+".json"
+        sourcePath: pwaPath+target+separator+"manifest-"+target+".webmanifest"
       ↓Duplicate_fileNGSWWORKER [steps.DuplicateStep-1603294005702]: 
         comment: duplicate ngsw-worker.js named with target name
         copyName: '"ngsw-worker-"+target+".js"'
+        isEnabled: false
         overwrite: true
         sourcePath: projectPath +separator+"DisplayObjects"+separator+"mobile"+separator+"ngsw-worker.js"
       ↓Move_fileNGSWWORKER [steps.MoveStep-1603293049574]: 
         comment: move file ngsw-worker to our new dir
         destinationPath: pwaPath+target
+        isEnabled: false
         overwrite: true
         sourcePath: projectPath +separator+"DisplayObjects"+separator+"mobile"+separator+"ngsw-worker-"+target+".js"
       ↓Rename_fileNGSWWORKER [steps.RenameStep-1603294146873]: 
         comment: rename ngsw-worker-targetName.js to ngsw-worker.js
+        isEnabled: false
         newName: '"ngsw-worker.js"'
         overwrite: true
         sourcePath: pwaPath+target+separator+"ngsw-worker-"+target+".js"
@@ -133,10 +136,12 @@ responseTimeout: 600
           var charset = StandardCharsets.UTF_8;
           // get text as string
           var content = new JString(Files.readAllBytes(filePath), charset);
-          // replace new manifest name
-          content = content.replaceAll(''<link rel="manifest" href="assets/manifest.json">'', ''<link rel="manifest" href="./manifest.json">'');
+          // replace new manifest name (not needed anymore)
+          //content = content.replaceAll(''<link rel="manifest" href="assets/manifest.json">'', ''<link rel="manifest" href="./manifest.json">'');
           try{
-          		log.warning(pwaName);
+          		//replace base href
+          		var regexBase = '' <base href="/convertigo/projects/C8Oforms/DisplayObjects/mobile/">'';
+          		content = content.replaceAll(regexBase, ''<base href="/convertigo/projects/C8Oforms/DisplayObjects/pwas/''+target+''/>"'');
           		// replace title
           		var regexTitle = "<title>.*<\/title>";
           		content = content.replaceAll(regexTitle, "<title>"+pwaName+"</title>");
@@ -196,8 +201,8 @@ responseTimeout: 600
       try{
       	index = jIndex = ((target == undefined || target == "" ) ? projectPath + separator+"DisplayObjects"+separator+"mobile"+separator+"index"+".html" :
       														  pwaPath + target + separator + "index" + ".html");
-      	manifest = jManifest = ((target == undefined || target == "" ) ? projectPath + separator+"DisplayObjects"+separator+"mobile"+separator+"assets"+separator+"manifest.json" :
-      														  pwaPath + target + separator + "manifest.json");
+      	manifest = jManifest = ((target == undefined || target == "" ) ? projectPath + separator+"DisplayObjects"+separator+"mobile"+separator+"assets"+separator+"manifest.webmanifest" :
+      														  pwaPath + target + separator + "manifest.webmanifest");
       	destination = jDest = ((target == undefined || target == "") ?  projectPath + separator + "DisplayObjects" + separator + "mobile" + separator + "assets" :
       														  pwaPath + target + separator + "pwa-assets");
       	logo = jLogo     = image + "";
@@ -233,8 +238,8 @@ responseTimeout: 600
       // get file path
       var filePath = 
       	Paths.get(
-      				((target == undefined || target == "") ? projectPath + separator+"DisplayObjects"+separator+"mobile"+separator+"assets"+separator+"manifest.json" :
-      														 pwaPath + target + separator + "manifest.json"
+      				((target == undefined || target == "") ? projectPath + separator+"DisplayObjects"+separator+"mobile"+separator+"assets"+separator+"manifest.webmanifest" :
+      														 pwaPath + target + separator + "manifest.webmanifest"
       				)
       			);
       // get charset utf8
@@ -249,7 +254,7 @@ responseTimeout: 600
       pwaShortName != "" ? jsonManifest["short_name"] = pwaShortName : null;
       pwaBackgroundColor != "" ? jsonManifest["background_color"] = pwaBackgroundColor : null;
       pwaThemeColor != "" ? jsonManifest["theme_color"] = pwaThemeColor : null;
-      target != "" ? jsonManifest["start_url"] = "./index.html"+ (queryParameters != "" ? "?" + queryParameters : ""): "";
+      target != "" ? jsonManifest["start_url"] = "./"+ (queryParameters != "" ? "?" + queryParameters : ""): "";
       jsonManifest["scope"] = ((target == undefined || target == "") ? "/convertigo/projects/" + projectName + "/DisplayObjects/mobile/" :
       																 "/convertigo/projects/" + projectName + "/DisplayObjects/pwas/"+target+"/");
       try {
@@ -281,12 +286,39 @@ responseTimeout: 600
       expression: |
         '//todo
         try {
+        	var cmd =[]
+        	let firstAppend = true;
         	if(target != undefined && target != ""){
         		var mobilePath = projectPath + separator+"DisplayObjects"+separator+"mobile"+separator;
-        		var cmdSymLink = isWindows ?
+        		var mobilePath2 = projectPath + separator+"DisplayObjects"+separator+"mobile";
+        		var f  = java.io.File(projectPath + separator+"DisplayObjects"+separator+"mobile")
+        		var listOfFiles  = f.listFiles();
+        		for (var i = 0; i < listOfFiles.length; i++) {
+        			var currentFileName = ""+listOfFiles[i].getName();
+        		  	if (listOfFiles[i].isFile()) {
+        		    	if(currentFileName != "index.html" && currentFileName != "manifest.webmanifest" && currentFileName != "ngsw.json"){
+        					//create symlink
+        					log.warn("added following file to symlinks: " + currentFileName);
+        					cmd.push( "cmd /C mklink "+pwaPath+target+ separator + currentFileName + " " + mobilePath2 + separator + currentFileName);
+        				}
+        				else{
+        					// ignore it
+        					log.warn("ingored following file from symlinks: " + currentFileName);
+        				} 
+        		  	} else if (listOfFiles[i].isDirectory()) {
+        		  		log.warn("added following dir to symlinks: " + currentFileName);
+        		  		cmd.push("cmd /C mklink /j "+pwaPath+target + separator+ currentFileName+ " " + mobilePath2 + separator+ currentFileName);
+        		    	//create symlink anyway
+        		  	}
+        		}
+        		
+        		log.warn("maCMD: "+JSON.stringify(cmd));
+        		
+        		/*var cmdSymLink = isWindows ?
         				"cmd /C mklink /j "+pwaPath+target+separator+"assets " + mobilePath + "assets && mklink /j "+pwaPath+target+separator+"build " + mobilePath + "build":
         				["bash", "-c" ,"ln -sfn " + mobilePath + "assets " + pwaPath+target+separator+"assets && ln -sfn " + mobilePath + "build " + pwaPath+target+separator+"build"];	
-        		log.debug("will execute following command to create symlinks => \n "+ cmdSymLink);
+        		log.debug("will execute following command to create symlinks => \n "+ cmdSymLink);*/
+        		var arrayCMD= cmd;
         	}
         }
         catch(e){
@@ -294,9 +326,11 @@ responseTimeout: 600
         	log.warning(""+e);
         }'
       output: true
-    ↓Process_execute [steps.ProcessExecStep-1603297502894]: 
-      commandLine: cmdSymLink
-      output: true
+    ↓jIterator [steps.SimpleIteratorStep-1647966771613]: 
+      expression: arrayCMD
+      ↓Process_execute [steps.ProcessExecStep-1603297502894]: 
+        commandLine: item
+        output: true
 ↓Sequence_JSFindNgswconfigPath [steps.SimpleStep-1603366228196]: 
   expression: |
     '//imports
