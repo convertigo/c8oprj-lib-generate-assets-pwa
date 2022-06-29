@@ -140,7 +140,15 @@ responseTimeout: 600
           //content = content.replaceAll(''<link rel="manifest" href="assets/manifest.json">'', ''<link rel="manifest" href="./manifest.json">'');
           try{
           		//replace base href
-          		var regexBase = '' <base href="/convertigo/projects/C8Oforms/DisplayObjects/mobile/">'';
+          		var regexBase;
+          		var regexBase1 = ''<base href="/convertigo/projects/C8Oforms/DisplayObjects/mobile/"/>'';
+          		var regexBase2 = ''<base href="/convertigo/projects/C8Oforms/DisplayObjects/mobile/">'';
+          		if(content.indexOf(regexBase1) != -1){
+          			regexBase = regexBase1;
+          		}
+          		else{
+          			regexBase = regexBase2;
+          		}
           		content = content.replaceAll(regexBase, ''<base href="/convertigo/projects/C8Oforms/DisplayObjects/pwas/''+target+''/>"'');
           		// replace title
           		var regexTitle = "<title>.*<\/title>";
