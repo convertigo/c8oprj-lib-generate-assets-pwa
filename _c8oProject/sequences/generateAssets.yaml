@@ -53,6 +53,7 @@ responseTimeout: 600
   ↓IfFileExistsThenElse [steps.IfFileExistThenElseStep-1603273719750]: 
     comment: search if npm lib pwa-asset-generator is already installed
     condition: file + separator + "pwa-asset-generator"
+    isEnabled: false
     ↓jThen [steps.ThenStep-1603273719752]: 
       ↓Sequence_JSLogNoNeededInstall [steps.SimpleStep-1603452990036]: 
         expression: log.debug("pwa-assets-generator is already installed, no need to install again");
@@ -307,7 +308,10 @@ responseTimeout: 600
         		    	if(currentFileName != "index.html" && currentFileName != "manifest.webmanifest" && currentFileName != "ngsw.json"){
         					//create symlink
         					log.warn("added following file to symlinks: " + currentFileName);
-        					cmd.push( "cmd /C mklink "+pwaPath+target+ separator + currentFileName + " " + mobilePath2 + separator + currentFileName);
+        					var cmdLoc = isWindows ? 
+        								"cmd /C mklink "+pwaPath+target+ separator + currentFileName + " " + mobilePath2 + separator + currentFileName :
+        								["bash", "-c" ,"ln -sfn " + mobilePath2 + separator + currentFileName + " " + pwaPath+target+ separator + currentFileName];
+        					cmd.push(cmdLoc);
         				}
         				else{
         					// ignore it
@@ -315,8 +319,10 @@ responseTimeout: 600
         				} 
         		  	} else if (listOfFiles[i].isDirectory()) {
         		  		log.warn("added following dir to symlinks: " + currentFileName);
-        		  		cmd.push("cmd /C mklink /j "+pwaPath+target + separator+ currentFileName+ " " + mobilePath2 + separator+ currentFileName);
-        		    	//create symlink anyway
+        		  		var cmdLoc = isWindows ? 
+        		  					"cmd /C mklink /j "+pwaPath+target + separator+ currentFileName+ " " + mobilePath2 + separator+ currentFileName :
+        		  					["bash", "-c" ,"ln -sfn " + mobilePath2 + separator+ currentFileName + " " +pwaPath+target + separator+ currentFileName];
+        		  		cmd.push(cmdLoc);
         		  	}
         		}
         		
