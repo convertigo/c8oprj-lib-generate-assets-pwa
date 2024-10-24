@@ -28,6 +28,69 @@ responseTimeout: 600
         - java.lang.String: 
           - ↑value: ./onlyReGenerateNGSW/text()
   variableName: onlyNGSW
+↓jIf1 [steps.IfStep-1729782059125]: 
+  condition: onlyNGSW != "false"
+  ↓Duplicate_fileIndexHTML [steps.DuplicateStep-1729782059131]: 
+    comment: duplicate index.html named with target name
+    copyName: '"index"+target+".html"'
+    overwrite: true
+    sourcePath: projectPath +separator+"DisplayObjects"+separator+"template-pwa"+separator+"index.html"
+  ↓Move_fileIndexHTML [steps.MoveStep-1729782059134]: 
+    comment: move file manifest to our new dir
+    destinationPath: pwaPath+target
+    overwrite: true
+    sourcePath: projectPath +separator+"DisplayObjects"+separator+"template-pwa"+separator+"index"+target+".html"
+  ↓Rename_fileIndexHTML [steps.RenameStep-1729782059137]: 
+    comment: rename index-targetName.html to index.html
+    newName: '"index.html"'
+    overwrite: true
+    sourcePath: pwaPath+target+separator+"index"+target+".html"
+  ↓Sequence_JSReplaceLinkForManifest [steps.SimpleStep-1729782059149]: 
+    comment: change link for our new manifest
+    expression: |
+      '// imports
+      var Path = use("java.nio.file.Path");
+      var Paths = use("java.nio.file.Paths");
+      var Files = use("java.nio.file.Files");
+      var StandardCharsets = use("java.nio.charset.StandardCharsets");
+      var JString = use("java.lang.String");
+      // get file path
+      var filePath =  Paths.get(pwaPath+target+separator+"index.html");
+      // get charset utf8
+      var charset = StandardCharsets.UTF_8;
+      // get text as string
+      var content = new JString(Files.readAllBytes(filePath), charset);
+      // replace new manifest name (not needed anymore)
+      //content = content.replaceAll(''<link rel="manifest" href="assets/manifest.json">'', ''<link rel="manifest" href="./manifest.json">'');
+      try{
+      		//replace base href
+      		var regexBase;
+      		var regexBase1 = ''<base href="/convertigo/projects/C8Oforms/DisplayObjects/mobile/"/>'';
+      		var regexBase2 = ''<base href="/convertigo/projects/C8Oforms/DisplayObjects/mobile/">'';
+      		if(content.indexOf(regexBase1) != -1){
+      			regexBase = regexBase1;
+      		}
+      		else{
+      			regexBase = regexBase2;
+      		}
+      		content = content.replaceAll(regexBase, ''<base href="/convertigo/projects/C8Oforms/DisplayObjects/pwas/''+target+''/>"'');
+      		// replace title
+      		var regexTitle = "<title>.*<\/title>";
+      		content = content.replaceAll(regexTitle, "<title>"+pwaName+"</title>");
+      		// replace icon
+      		var regexIcn = ''<link rel="icon" type=".*" href=".*">''
+      		content = content.replaceAll(regexIcn, ''<link rel="icon" type="image/png" href="pwa-assets/manifest-icon-192.png"/>'');
+      		// replace theme-color
+      		var regexTheme = ''<meta name="theme-color" content=".*">'';
+      		content = content.replaceAll(regexTheme, ''<meta name="theme-color" content="''+pwaThemeColor+''">'');
+      }
+      catch(e){
+      	log.warning("error index");
+      	log.warning(JSON.stringify(e));
+      }
+      
+      
+      Files.write(filePath, content.getBytes(charset));'
 ↓jIf [steps.IfStep-1729755896212]: 
   condition: onlyNGSW == "false"
   ↓Create_directory [steps.CreateDirectoryStep-1729755896257]: 
