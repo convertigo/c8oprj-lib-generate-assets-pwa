@@ -1,0 +1,366 @@
+accessibility: Hidden
+responseTimeout: 600
+↓Input_variables [steps.InputVariablesStep-1729755896203]: 
+↓defineHelpers [steps.SimpleStep-1729755896206]: 
+  expression: |
+    '//Register time Start
+    var timeStart = new Date().getTime();
+    // Define var isWindows to detect unix like system or not
+    var isWindows = org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
+    // Define separator switch os
+    var separator = isWindows ? "\\" :"/";
+    // Define current Project path
+    var projectPath = com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName(projectName).getDirPath();
+    // Define target Project path
+    var projectTargetPath = com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName(projectTargetName).getDirPath();
+    // compute dir for pwas
+    var pwaPath = projectTargetPath + separator +"DisplayObjects"+separator+"pwas"+separator;
+    log.debug("Sequence lib_GeneratePWAAssets.GenaratePwaAssets has been called");
+    log.debug("We will generate pwa named "+pwaName+ (target != "" ? " with target: " + target : "with no target") +", "+ (onlyReGenerateNGSW == "false" ? "(Full re-generation)": ("Only re-generating ngsw")));
+    log.debug("Generate Assets => \nUnix OS = "+isWindows+ " \nSeparator that will be used is: "+separator+" \nTargeted project path is: "+projectPath);'
+↓jSimpleSource [steps.SimpleSourceStep-1729755896209]: 
+  sourceDefinition: 
+    - xmlizable: 
+      - ↑classname: com.twinsoft.convertigo.beans.common.XMLVector
+      - com.twinsoft.convertigo.beans.common.XMLVector: 
+        - java.lang.String: 
+          - ↑value: 1729755896203
+        - java.lang.String: 
+          - ↑value: ./onlyReGenerateNGSW/text()
+  variableName: onlyNGSW
+↓jIf [steps.IfStep-1729755896212]: 
+  condition: onlyNGSW == "false"
+  ↓Create_directory [steps.CreateDirectoryStep-1729755896257]: 
+    comment: create a dir for the target ex pwa_123...
+    destinationPath: pwaPath+target+separator+"pwa-assets"
+  ↓Duplicate_fileIndexHTML [steps.DuplicateStep-1729755896260]: 
+    comment: duplicate index.html named with target name
+    copyName: '"index"+target+".html"'
+    overwrite: true
+    sourcePath: projectPath +separator+"DisplayObjects"+separator+"template-pwa"+separator+"index.html"
+  ↓Move_fileIndexHTML [steps.MoveStep-1729755896263]: 
+    comment: move file manifest to our new dir
+    destinationPath: pwaPath+target
+    overwrite: true
+    sourcePath: projectPath +separator+"DisplayObjects"+separator+"template-pwa"+separator+"index"+target+".html"
+  ↓Rename_fileIndexHTML [steps.RenameStep-1729755896266]: 
+    comment: rename index-targetName.html to index.html
+    newName: '"index.html"'
+    overwrite: true
+    sourcePath: pwaPath+target+separator+"index"+target+".html"
+  ↓Duplicate_fileManifest [steps.DuplicateStep-1729755896269]: 
+    comment: duplicate manifest.json named with target name
+    copyName: '"manifest-"+target+".webmanifest"'
+    overwrite: true
+    sourcePath: projectPath +separator+"DisplayObjects"+separator+"template-pwa"+separator + "manifest.webmanifest"
+  ↓Move_fileManifest [steps.MoveStep-1729755896272]: 
+    comment: move file manifest to our new dir
+    destinationPath: pwaPath+separator+target
+    overwrite: true
+    sourcePath: projectPath +separator+ "DisplayObjects"+separator+"template-pwa"+separator+"manifest-"+target+".webmanifest"
+  ↓Rename_fileManifest [steps.RenameStep-1729755896275]: 
+    comment: rename manifest-targetName.json to manifest.json
+    newName: '"manifest.webmanifest"'
+    overwrite: true
+    sourcePath: pwaPath+target+separator+"manifest-"+target+".webmanifest"
+  ↓Sequence_JSReplaceLinkForManifest [steps.SimpleStep-1729755896287]: 
+    comment: change link for our new manifest
+    expression: |
+      '// imports
+      var Path = use("java.nio.file.Path");
+      var Paths = use("java.nio.file.Paths");
+      var Files = use("java.nio.file.Files");
+      var StandardCharsets = use("java.nio.charset.StandardCharsets");
+      var JString = use("java.lang.String");
+      // get file path
+      var filePath =  Paths.get(pwaPath+target+separator+"index.html");
+      // get charset utf8
+      var charset = StandardCharsets.UTF_8;
+      // get text as string
+      var content = new JString(Files.readAllBytes(filePath), charset);
+      // replace new manifest name (not needed anymore)
+      //content = content.replaceAll(''<link rel="manifest" href="assets/manifest.json">'', ''<link rel="manifest" href="./manifest.json">'');
+      try{
+      		//replace base href
+      		var regexBase;
+      		var regexBase1 = ''<base href="/convertigo/projects/C8Oforms/DisplayObjects/mobile/"/>'';
+      		var regexBase2 = ''<base href="/convertigo/projects/C8Oforms/DisplayObjects/mobile/">'';
+      		if(content.indexOf(regexBase1) != -1){
+      			regexBase = regexBase1;
+      		}
+      		else{
+      			regexBase = regexBase2;
+      		}
+      		content = content.replaceAll(regexBase, ''<base href="/convertigo/projects/C8Oforms/DisplayObjects/pwas/''+target+''/>"'');
+      		// replace title
+      		var regexTitle = "<title>.*<\/title>";
+      		content = content.replaceAll(regexTitle, "<title>"+pwaName+"</title>");
+      		// replace icon
+      		var regexIcn = ''<link rel="icon" type=".*" href=".*">''
+      		content = content.replaceAll(regexIcn, ''<link rel="icon" type="image/png" href="pwa-assets/manifest-icon-192.png"/>'');
+      		// replace theme-color
+      		var regexTheme = ''<meta name="theme-color" content=".*">'';
+      		content = content.replaceAll(regexTheme, ''<meta name="theme-color" content="''+pwaThemeColor+''">'');
+      }
+      catch(e){
+      	log.warning("error index");
+      	log.warning(JSON.stringify(e));
+      }
+      
+      
+      Files.write(filePath, content.getBytes(charset));'
+  ↓computeParameters [steps.SimpleStep-1729755896296]: 
+    comment: prepare args for pwa-assets-generator
+    expression: |
+      '// define parameters before calling sequence pwaAssetGenerator sequence
+      try{
+      	index = jIndex = ((target == undefined || target == "" ) ? projectPath + separator+"DisplayObjects"+separator+"mobile"+separator+"index"+".html" :
+      														  pwaPath + target + separator + "index" + ".html");
+      	manifest = jManifest = ((target == undefined || target == "" ) ? projectPath + separator+"DisplayObjects"+separator+"mobile"+separator+"assets"+separator+"manifest.webmanifest" :
+      														  pwaPath + target + separator + "manifest.webmanifest");
+      	destination = jDest = ((target == undefined || target == "") ?  projectPath + separator + "DisplayObjects" + separator + "mobile" + separator + "assets" :
+      														  pwaPath + target + separator + "pwa-assets");
+      	logo = jLogo     = image + "";
+      	background = pwaBackgroundColor;
+      	theme = pwaThemeColor;
+      }
+      catch(e){
+      		log.error("An error occured while computing parameters for pwaAssetGenerator sequence:\n" + JSON.stringify(e))
+      }
+      
+      
+      '
+    output: true
+  ↓Call_Sequence [steps.SequenceStep-1729755896299]: 
+    sourceSequence: lib_GeneratePWAAssets.PwaAssetGenerator
+    ↓logo [variables.StepVariable-1729755896302]: 
+    ↓index [variables.StepVariable-1729755896305]: 
+    ↓manifest [variables.StepVariable-1729755896308]: 
+    ↓destination [variables.StepVariable-1729755896311]: 
+    ↓background [variables.StepVariable-1729755896314]: 
+      value: '#ffffff'
+    ↓theme [variables.StepVariable-1729755896317]: 
+      value: '#ffffff'
+  ↓Sequence_JSOverrideManifest [steps.SimpleStep-1729755896320]: 
+    comment: override manifest.json properties such as name etc...
+    expression: |
+      '// imports
+      var Path = use("java.nio.file.Path");
+      var Paths = use("java.nio.file.Paths");
+      var Files = use("java.nio.file.Files");
+      var StandardCharsets = use("java.nio.charset.StandardCharsets");
+      var JString = use("java.lang.String");
+      // get file path
+      var filePath = 
+      	Paths.get(
+      				((target == undefined || target == "") ? projectPath + separator+"DisplayObjects"+separator+"mobile"+separator+"assets"+separator+"manifest.webmanifest" :
+      														 pwaPath + target + separator + "manifest.webmanifest"
+      				)
+      			);
+      // get charset utf8
+      var charset = StandardCharsets.UTF_8;
+      // get text as js string
+      var content = "" + new JString(Files.readAllBytes(filePath), charset);
+      // parse string as JSON Object
+      var jsonManifest = JSON.parse(content);
+      
+      // override existing values with new ones if they are not empty
+      pwaName != "" ? jsonManifest["name"] = pwaName : null;
+      pwaShortName != "" ? jsonManifest["short_name"] = pwaShortName : null;
+      pwaBackgroundColor != "" ? jsonManifest["background_color"] = pwaBackgroundColor : null;
+      pwaThemeColor != "" ? jsonManifest["theme_color"] = pwaThemeColor : null;
+      target != "" ? jsonManifest["start_url"] = "./"+ (queryParameters != "" ? "?" + queryParameters : ""): "";
+      jsonManifest["scope"] = ((target == undefined || target == "") ? "/convertigo/projects/" + projectName + "/DisplayObjects/mobile/" :
+      																 "/convertigo/projects/" + projectName + "/DisplayObjects/pwas/"+target+"/");
+      try {
+      	var others = JSON.parse(additionalParametersJSONObjectString);
+      	log.warning("additionalParametersJSONObjectString")
+      	log.warning(JSON.stringify(others));
+      	for (var i in others) {
+      		log.warning("i:" +i);
+      		if(["name", "short_name", "start_url", "display", "icons", "background_color", "theme_color", "scope"].indexOf(i) == -1){
+      			log.warning("others[i] :" +others[i]);
+      			others[i] != "" ? jsonManifest[i] = others[i] : null;
+      		}
+      		else{
+      			log.debug("additionalParametersJSONObjectString, key " + i + " is forbidden");
+      		}
+      		
+      	}
+      }
+      catch(e){
+      	log.warning("catched error"+ JSON.stringify(e));
+      }
+      // override content value with our new ones
+      content = new JString(""+JSON.stringify(jsonManifest));
+      // rewrite file
+      Files.write(filePath, content.getBytes(charset));'
+  ↓createSymlinkInPWAS [steps.SimpleStep-1729756224737]: 
+    expression: |
+      '//create a symlink content folder DisplayObjects/pwas must contains by a symlink content folder DisplayObjects/mobile we will do it by cmd or bash command
+      
+      
+      if(isWindows){
+      	var cmd = ''cmd /C mklink /J '' + projectPath + separator + ''DisplayObjects'' + separator + '' '' + projectTargetPath + separator + ''DisplayObjects'' + separator + ''pwas''; 
+      	var cmd2 = ''cmd /C mklink /J '' + projectPath + separator + ''DisplayObjects'' + separator + '' '' + projectTargetPath + separator + ''DisplayObjects'' + separator + ''pwas''; 
+      }
+      else{
+      	var cmdLinkScripts = ["bash", "-c" ,"ln -sfn "+projectPath + separator + ''DisplayObjects'' + separator + ''template-pwa''+separator+''scripts '' + pwaPath+target + separator +  "scripts"];
+      	var cmdLinkAssets = ["bash", "-c" ,"ln -sfn "+projectPath + separator + ''DisplayObjects'' + separator + ''template-pwa''+separator+''assets '' + pwaPath+target + separator +  "assets"];
+      	var cmdLinkSvg = ["bash", "-c" ,"ln -sfn "+projectPath + separator + ''DisplayObjects'' + separator + ''template-pwa''+separator+''svg '' + pwaPath+target + separator +  "svg"];
+      }
+      
+      log.warn("cmd is " + cmd);'
+  ↓Process_execute3 [steps.ProcessExecStep-1729756224740]: 
+    commandLine: cmdLinkScripts
+    output: true
+  ↓Process_execute1 [steps.ProcessExecStep-1729759910606]: 
+    commandLine: cmdLinkAssets
+    output: true
+  ↓Process_execute2 [steps.ProcessExecStep-1729763267037]: 
+    commandLine: cmdLinkSvg
+    output: true
+↓Copy_Ngswworker [steps.CopyStep-1729757359145]: 
+  destinationPath: pwaPath+separator+target
+  sourcePath: projectPath +separator+"DisplayObjects"+separator+"template-pwa" + separator +"ngsw-worker.js"
+↓Copy_Ngswjson [steps.CopyStep-1729758021856]: 
+  destinationPath: pwaPath+separator+target
+  sourcePath: projectPath +separator+"DisplayObjects"+separator+"template-pwa"+ separator +"ngsw.json"
+↓PrepareSedAnrRecalculateHashInNgsw [steps.SimpleStep-1729758157997]: 
+  expression: |
+    '
+    
+    // Importation des classes nécessaires avec le chemin complet
+    var MessageDigest = java.security.MessageDigest;
+    var FileInputStream = java.io.FileInputStream;
+    var BufferedInputStream = java.io.BufferedInputStream;
+    var Files = java.nio.file.Files;
+    var Paths = java.nio.file.Paths;
+    
+    // Fonction pour calculer le hash SHA-1
+    function calculateSHA1(filePath) {
+        var sha1Digest = MessageDigest.getInstance("SHA-1"); // Créer une instance SHA-1
+    
+        // Lire le fichier sous forme de flux de bytes
+        var fileInputStream = new FileInputStream(filePath);
+        var bufferedInputStream = new BufferedInputStream(fileInputStream);
+        
+        var dataBuffer = java.lang.reflect.Array.newInstance(java.lang.Byte.TYPE, 1024);
+        var bytesRead;
+        
+        // Mettre à jour le digest avec les données du fichier
+        while ((bytesRead = bufferedInputStream.read(dataBuffer)) != -1) {
+            sha1Digest.update(dataBuffer, 0, bytesRead);
+        }
+        
+        bufferedInputStream.close();
+        
+        // Obtenir le résultat du calcul sous forme de tableau d''octets
+        var hashBytes = sha1Digest.digest();
+        
+        // Convertir le tableau d''octets en une chaîne hexadécimale
+        var stringBuffer = new java.lang.StringBuilder();
+        for (var i = 0; i < hashBytes.length; i++) {
+            stringBuffer.append(java.lang.String.format("%02x", new java.lang.Byte(hashBytes[i])));
+        }
+    
+        return stringBuffer.toString();
+    }
+    
+    // Exemple d''appel
+    var filePath = pwaPath + target+separator + "index.html"; 
+    var sha1HashIndexHtml = calculateSHA1(filePath);
+    log.warn("SHA-1 hash sha1HashIndexHtml: " + sha1HashIndexHtml);
+    filePath = pwaPath + target+separator + "manifest.webmanifest"; 
+    var sha1Manifest = calculateSHA1(filePath);
+    log.warn("SHA-1 hash sha1Manifest: " + sha1Manifest);
+    
+    var cmdSed = isWindows ? 
+    ''echo "not supported yet"''
+    :
+    ["bash", "-c" ,"sed -i ''s#DisplayObjects/mobile/#DisplayObjects/pwas/"+target+"/#g'' "+ pwaPath + target+separator + "ngsw.json"];
+    
+    log.warn("cmd unique is " + cmdSed);
+    
+    var cmdReplaceSHA1_index = isWindows ? 
+    ''echo "not supported yet"''
+    :
+    ["bash", "-c" ,`sed -i -E ''s/index\.html": "[a-f0-9]{40}"/index.html": "`+ sha1HashIndexHtml +`"/g'' ` + pwaPath + target+separator + "ngsw.json"];
+    
+    var cmdReplaceSHA1_manifest = isWindows ? 
+    ''echo "not supported yet"''
+    :
+    ["bash", "-c" ,`sed -i -E ''s/manifest\.webmanifest": "[a-f0-9]{40}"/manifest.webmanifest": "`+sha1Manifest+ `"/g'' ` + pwaPath + target+separator + "ngsw.json"];'
+↓Process_execute [steps.ProcessExecStep-1729758508811]: 
+  commandLine: cmdSed
+  output: true
+↓Process_execute1 [steps.ProcessExecStep-1729773315313]: 
+  commandLine: cmdReplaceSHA1_index
+  output: true
+↓Process_execute2 [steps.ProcessExecStep-1729773316573]: 
+  commandLine: cmdReplaceSHA1_manifest
+  output: true
+↓printTotalTime [steps.SimpleStep-1729755896341]: 
+  expression: |
+    '//Register time end
+    var timeEnd = new Date().getTime();
+    
+    log.debug("Generate Assets sequence total time is: " +((timeEnd - timeStart) / 1000) + " seconds");
+    var pkillChrome = null;
+    if(java.lang.System.getenv("CONVERTIGO_GPG_KEYS") != null){
+    	log.debug("CONVERTIGO_GPG_KEYS detected, we are in docker and will kill any instance of chrome remaning");
+    	pkillChrome =  ["bash","-c","sudo pkill chrome"];
+    }'
+↓jIfPKILL [steps.IfStep-1729755896344]: 
+  condition: pkillChrome != null
+  ↓Process_execute1 [steps.ProcessExecStep-1729755896347]: 
+    commandLine: pkillChrome
+    output: true
+↓image [variables.RequestableVariable-1729755896350]: 
+  isFileUpload: true
+↓projectName [variables.RequestableVariable-1729755896353]: 
+↓target [variables.RequestableVariable-1729755896356]: 
+  value: 
+↓pwaName [variables.RequestableVariable-1729755896359]: 
+  value: 
+↓pwaShortName [variables.RequestableVariable-1729755896362]: 
+  value: 
+↓pwaBackgroundColor [variables.RequestableVariable-1729755896365]: 
+  value: 
+↓pwaThemeColor [variables.RequestableVariable-1729755896368]: 
+  value: 
+↓additionalParametersJSONObjectString [variables.RequestableVariable-1729755896371]: 
+  value: '{}'
+↓queryParameters [variables.RequestableVariable-1729755896374]: 
+  value: 
+↓scrape [variables.RequestableVariable-1729755896377]: 
+  comment: 'Scraping Apple Human Interface guidelines to fetch splash screen specs  [default: "false"]'
+  value: false
+↓onlyReGenerateNGSW [variables.RequestableVariable-1729755896380]: 
+  value: false
+↓ngswFileName [variables.RequestableVariable-1729755896383]: 
+  value: ngsw-config.json
+↓projectTargetName [variables.RequestableVariable-1729755896386]: 
+↓Test_Case [core.TestCase]: 
+  ↓image [variables.TestCaseVariable-1729755896390]: 
+  ↓projectName [variables.TestCaseVariable-1729755896393]: 
+  ↓target [variables.TestCaseVariable-1729755896396]: 
+    value: 
+  ↓pwaName [variables.TestCaseVariable-1729755896399]: 
+    value: 
+  ↓pwaShortName [variables.TestCaseVariable-1729755896402]: 
+    value: 
+  ↓pwaBackgroundColor [variables.TestCaseVariable-1729755896405]: 
+    value: 
+  ↓pwaThemeColor [variables.TestCaseVariable-1729755896408]: 
+    value: 
+  ↓additionalParametersJSONObjectString [variables.TestCaseVariable-1729755896411]: 
+    value: '{}'
+  ↓queryParameters [variables.TestCaseVariable-1729755896414]: 
+    value: 
+  ↓scrape [variables.TestCaseVariable-1729755896417]: 
+    value: false
+  ↓onlyReGenerateNGSW [variables.TestCaseVariable-1729755896420]: 
+    value: false
+  ↓ngswFileName [variables.TestCaseVariable-1729755896423]: 
+    value: ngsw-config.json
