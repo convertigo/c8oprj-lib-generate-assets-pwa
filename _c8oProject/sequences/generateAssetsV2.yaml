@@ -15,9 +15,9 @@ responseTimeout: 600
     var projectTargetPath = com.twinsoft.convertigo.engine.Engine.theApp.databaseObjectsManager.getOriginalProjectByName(projectTargetName).getDirPath();
     // compute dir for pwas
     var pwaPath = projectTargetPath + separator +"DisplayObjects"+separator+"pwas"+separator;
-    log.debug("Sequence lib_GeneratePWAAssets.GenaratePwaAssets has been called");
-    log.debug("We will generate pwa named "+pwaName+ (target != "" ? " with target: " + target : "with no target") +", "+ (onlyReGenerateNGSW == "false" ? "(Full re-generation)": ("Only re-generating ngsw")));
-    log.debug("Generate Assets => \nUnix OS = "+isWindows+ " \nSeparator that will be used is: "+separator+" \nTargeted project path is: "+projectPath);'
+    log.debug("generateAssetsV2] defineHelpers has been called");
+    log.debug("generateAssetsV2] defineHelpers We will generate pwa named "+pwaName+ (target != "" ? " with target: " + target : "with no target") +", "+ (onlyReGenerateNGSW == "false" ? "(Full re-generation)": ("Only re-generating ngsw")));
+    log.debug("generateAssetsV2] defineHelpers Generate Assets => \nUnix OS = "+isWindows+ " \nSeparator that will be used is: "+separator+" \nTargeted project path is: "+projectPath);'
 ↓jSimpleSource [steps.SimpleSourceStep-1729755896209]: 
   sourceDefinition: 
     - xmlizable: 
@@ -105,8 +105,8 @@ responseTimeout: 600
     		content = content.replaceAll(regexTheme, ''<meta name="theme-color" content="''+pwaThemeColor+''">'');
     }
     catch(e){
-    	log.warning("error index");
-    	log.warning(JSON.stringify(e));
+    	log.error("[generateAssetsV2] error in Sequence_JSReplaceLinkForManifest");
+    	log.error(JSON.stringify(e));
     }
     
     
@@ -129,7 +129,7 @@ responseTimeout: 600
       	theme = pwaThemeColor;
       }
       catch(e){
-      		log.error("An error occured while computing parameters for pwaAssetGenerator sequence:\n" + JSON.stringify(e))
+      		log.error("generateAssetsV2] computeParameters An error occured while computing parameters for pwaAssetGenerator sequence:\n" + JSON.stringify(e))
       }
       
       
@@ -178,12 +178,8 @@ responseTimeout: 600
       																 "/convertigo/projects/" + projectName + "/DisplayObjects/pwas/"+target+"/");
       try {
       	var others = JSON.parse(additionalParametersJSONObjectString);
-      	log.warning("additionalParametersJSONObjectString")
-      	log.warning(JSON.stringify(others));
       	for (var i in others) {
-      		log.warning("i:" +i);
       		if(["name", "short_name", "start_url", "display", "icons", "background_color", "theme_color", "scope"].indexOf(i) == -1){
-      			log.warning("others[i] :" +others[i]);
       			others[i] != "" ? jsonManifest[i] = others[i] : null;
       		}
       		else{
@@ -193,7 +189,7 @@ responseTimeout: 600
       	}
       }
       catch(e){
-      	log.warning("catched error"+ JSON.stringify(e));
+      	log.warn(" generateAssetsV2] Sequence_JSOverrideManifest tcatched error"+ JSON.stringify(e));
       }
       // override content value with our new ones
       content = new JString(""+JSON.stringify(jsonManifest, null, 2));
@@ -205,8 +201,9 @@ responseTimeout: 600
       
       
       if(isWindows){
-      	var cmd = ''cmd /C mklink /J '' + projectPath + separator + ''DisplayObjects'' + separator + '' '' + projectTargetPath + separator + ''DisplayObjects'' + separator + ''pwas''; 
-      	var cmd2 = ''cmd /C mklink /J '' + projectPath + separator + ''DisplayObjects'' + separator + '' '' + projectTargetPath + separator + ''DisplayObjects'' + separator + ''pwas''; 
+      	var cmdLinkScripts = ''cmd /C mklink /J "'' + pwaPath + target + separator + ''scripts" "'' + projectPath + separator + ''DisplayObjects'' + separator + ''template-pwa'' + separator + ''scripts"'';
+          var cmdLinkAssets = ''cmd /C mklink /J "'' + pwaPath + target + separator + ''assets" "'' + projectPath + separator + ''DisplayObjects'' + separator + ''template-pwa'' + separator + ''assets"'';
+          var cmdLinkSvg = ''cmd /C mklink /J "'' + pwaPath + target + separator + ''svg" "'' + projectPath + separator + ''DisplayObjects'' + separator + ''template-pwa'' + separator + ''svg"'';
       }
       else{
       	var cmdLinkScripts = ["bash", "-c" ,"ln -sfn "+projectPath + separator + ''DisplayObjects'' + separator + ''template-pwa''+separator+''scripts '' + pwaPath+target + separator +  "scripts"];
@@ -214,7 +211,9 @@ responseTimeout: 600
       	var cmdLinkSvg = ["bash", "-c" ,"ln -sfn "+projectPath + separator + ''DisplayObjects'' + separator + ''template-pwa''+separator+''svg '' + pwaPath+target + separator +  "svg"];
       }
       
-      log.warn("cmd is " + cmd);'
+      log.debug("generateAssetsV2] createSymlinkInPWAS command cmdLinkScripts is: "+ cmdLinkScripts);
+      log.debug("generateAssetsV2] createSymlinkInPWAS command cmdLinkAssets is: "+ cmdLinkAssets);
+      log.debug("generateAssetsV2] createSymlinkInPWAS cmdLinkSvg cmdLinkScripts is: "+ cmdLinkSvg);'
   ↓Process_execute3 [steps.ProcessExecStep-1729784982067]: 
     commandLine: cmdLinkScripts
     output: true
@@ -276,27 +275,31 @@ responseTimeout: 600
     // Exemple d''appel
     var filePath = pwaPath + target+separator + "index.html"; 
     var sha1HashIndexHtml = calculateSHA1(filePath);
-    log.warn("SHA-1 hash sha1HashIndexHtml: " + sha1HashIndexHtml);
+    log.debug("generateAssetsV2] PrepareSedAnrRecalculateHashInNgsw SHA-1 hash sha1HashIndexHtml: " + sha1HashIndexHtml);
     filePath = pwaPath + target+separator + "manifest.webmanifest"; 
     var sha1Manifest = calculateSHA1(filePath);
-    log.warn("SHA-1 hash sha1Manifest: " + sha1Manifest);
+    log.debug("generateAssetsV2] PrepareSedAnrRecalculateHashInNgsw SHA-1 hash sha1Manifest: " + sha1Manifest);
     
     var cmdSed = isWindows ? 
-    ''echo "not supported yet"''
+    ["powershell", "-Command", "(Get-Content -Path " + pwaPath + target + separator + "ngsw.json).replace(''DisplayObjects/mobile/'', ''DisplayObjects/pwas/" + target + "/'') | Set-Content -Path " + pwaPath + target + separator + "ngsw.json"]
     :
     ["bash", "-c" ,"sed -i ''s#DisplayObjects/mobile/#DisplayObjects/pwas/"+target+"/#g'' "+ pwaPath + target+separator + "ngsw.json"];
     
     log.warn("cmd unique is " + cmdSed);
     
     var cmdReplaceSHA1_index = isWindows ? 
-    ''echo "not supported yet"''
+    ["powershell", "-Command", "(Get-Content -Path " + pwaPath + target + separator + "ngsw.json).replace(''index.html\": \"[a-f0-9]{40}\"'', ''index.html\": \"" + sha1HashIndexHtml + "\"'') | Set-Content -Path " + pwaPath + target + separator + "ngsw.json"]
     :
     ["bash", "-c" ,`sed -i -E ''s/index\.html": "[a-f0-9]{40}"/index.html": "`+ sha1HashIndexHtml +`"/g'' ` + pwaPath + target+separator + "ngsw.json"];
     
     var cmdReplaceSHA1_manifest = isWindows ? 
-    ''echo "not supported yet"''
+    ["powershell", "-Command", "(Get-Content -Path " + pwaPath + target + separator + "ngsw.json).replace(''manifest.webmanifest\": \"[a-f0-9]{40}\"'', ''manifest.webmanifest\": \"" + sha1Manifest + "\"'') | Set-Content -Path " + pwaPath + target + separator + "ngsw.json"]
     :
-    ["bash", "-c" ,`sed -i -E ''s/manifest\.webmanifest": "[a-f0-9]{40}"/manifest.webmanifest": "`+sha1Manifest+ `"/g'' ` + pwaPath + target+separator + "ngsw.json"];'
+    ["bash", "-c" ,`sed -i -E ''s/manifest\.webmanifest": "[a-f0-9]{40}"/manifest.webmanifest": "`+sha1Manifest+ `"/g'' ` + pwaPath + target+separator + "ngsw.json"];
+    
+    log.debug("generateAssetsV2] PrepareSedAnrRecalculateHashInNgsw command cmdSed is: "+ cmdSed);
+    log.debug("generateAssetsV2] PrepareSedAnrRecalculateHashInNgsw command cmdReplaceSHA1_index is: "+ cmdReplaceSHA1_index);
+    log.debug("generateAssetsV2] PrepareSedAnrRecalculateHashInNgsw cmdLinkSvg cmdReplaceSHA1_manifest is: "+ cmdReplaceSHA1_manifest);'
 ↓Process_execute [steps.ProcessExecStep-1729758508811]: 
   commandLine: cmdSed
   output: true
@@ -311,10 +314,10 @@ responseTimeout: 600
     '//Register time end
     var timeEnd = new Date().getTime();
     
-    log.debug("Generate Assets sequence total time is: " +((timeEnd - timeStart) / 1000) + " seconds");
+    log.debug("[generateAssetsV2] Generate Assets sequence total time is: " +((timeEnd - timeStart) / 1000) + " seconds");
     var pkillChrome = null;
     if(java.lang.System.getenv("CONVERTIGO_GPG_KEYS") != null){
-    	log.debug("CONVERTIGO_GPG_KEYS detected, we are in docker and will kill any instance of chrome remaning");
+    	log.debug("[generateAssetsV2] CONVERTIGO_GPG_KEYS detected, we are in docker and will kill any instance of chrome remaning");
     	pkillChrome =  ["bash","-c","sudo pkill chrome"];
     }'
 ↓jIfPKILL [steps.IfStep-1729755896344]: 
