@@ -85,7 +85,7 @@ responseTimeout: 600
     //content = content.replaceAll(''<link rel="manifest" href="assets/manifest.json">'', ''<link rel="manifest" href="./manifest.json">'');
     try{
     		//replace base href
-    		var regexBase;
+    		/*var regexBase;
     		var regexBase1 = ''<base href="/convertigo/projects/C8Oforms/DisplayObjects/mobile/"/>'';
     		var regexBase2 = ''<base href="/convertigo/projects/C8Oforms/DisplayObjects/mobile/">'';
     		if(content.indexOf(regexBase1) != -1){
@@ -94,7 +94,8 @@ responseTimeout: 600
     		else{
     			regexBase = regexBase2;
     		}
-    		content = content.replaceAll(regexBase, ''<base href="/convertigo/projects/C8Oforms/DisplayObjects/pwas/''+target+''/>"'');
+    		content = content.replaceAll(regexBase, ''<base href="/convertigo/projects/C8Oforms/DisplayObjects/pwas/''+target+''"/>'');
+    		*/
     		// replace title
     		var regexTitle = "<title>.*<\/title>";
     		content = content.replaceAll(regexTitle, "<title>"+pwaName+"</title>");
