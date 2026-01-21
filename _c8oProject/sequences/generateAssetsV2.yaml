@@ -94,7 +94,7 @@ responseTimeout: 600
     		else{
     			regexBase = regexBase2;
     		}
-    		content = content.replaceAll(regexBase, ''<base href="./"/>'');
+    		content = content.replaceAll(regexBase, ''<base href="./" data-c8o-mode="web">'');
     		// replace title
     		var regexTitle = "<title>.*<\/title>";
     		content = content.replaceAll(regexTitle, "<title>"+pwaName+"</title>");
