@@ -232,6 +232,29 @@ responseTimeout: 600
   destinationPath: pwaPath+separator+target
   overwrite: true
   sourcePath: projectPath +separator+"DisplayObjects"+separator+"template-pwa"+ separator +"ngsw.json"
+↓Copy_Envjson [steps.SimpleStep-1779802400000]: 
+  expression: |
+    '
+    try {
+        var File = use("java.io.File");
+        var FileUtils = use("org.apache.commons.io.FileUtils");
+        var sourceFile = new File(projectPath + separator + "DisplayObjects" + separator + "template-pwa" + separator + "env.json");
+        if (!sourceFile.exists()) {
+            sourceFile = new File(projectPath + separator + "DisplayObjects" + separator + "template-pwa" + separator + "scripts" + separator + "env.json");
+        }
+        if (sourceFile.exists() && sourceFile.isFile()) {
+            var destinationFile = new File(pwaPath + separator + target + separator + "env.json");
+            destinationFile.getParentFile().mkdirs();
+            FileUtils.copyFile(sourceFile, destinationFile);
+            log.debug("[generateAssetsV2] env.json copied to PWA " + target);
+        }
+        else {
+            log.warn("[generateAssetsV2] env.json not found for PWA " + target);
+        }
+    }
+    catch(e){
+        log.warn("[generateAssetsV2] unable to copy env.json to PWA " + target + ": " + e);
+    }'
 ↓PrepareSedAnrRecalculateHashInNgsw [steps.SimpleStep-1729758157997]: 
   expression: |
     '
