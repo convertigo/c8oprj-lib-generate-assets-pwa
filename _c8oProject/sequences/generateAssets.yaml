@@ -1,4 +1,4 @@
-accessibility: Hidden
+accessibility: Private
 responseTimeout: 600
 ↓Input_variables [steps.InputVariablesStep-1601370188093]: 
 ↓defineSeparatorSwitchOSAndDownlaodNode [steps.SimpleStep-1603226210951]: 
@@ -19,6 +19,11 @@ responseTimeout: 600
     }
     // compute dir for pwas
     var pwaPath = projectPath + separator +"DisplayObjects"+separator+"pwas"+separator;
+    // target names a folder under DisplayObjects/pwas: only letters, digits and underscores, 120 characters at most;
+    // an empty target regenerates the mobile application
+    if (target != null && ("" + target) != "" && !/^[A-Za-z0-9_]{1,120}$/.test("" + target)) {
+    	throw new java.lang.Exception("invalid target");
+    }
     log.debug("Sequence lib_GeneratePWAAssets.GenaratePwaAssets has been called");
     log.debug("We will generate pwa named "+pwaName+ (target != "" ? " with target: " + target : "with no target") +", "+ (onlyReGenerateNGSW == "false" ? "(Full re-generation)": ("Only re-generating ngsw")));
     log.debug("Generate Assets => \nUnix OS = "+isWindows+ " \nSeparator that will be used is: "+separator+" \nTargeted project path is: "+projectPath+" \nNode path is: "+file);'
@@ -152,14 +157,19 @@ responseTimeout: 600
           		}
           		content = content.replaceAll(regexBase, ''<base href="/convertigo/projects/C8Oforms/DisplayObjects/pwas/''+target+''/>"'');
           		// replace title
+                var escapeHtml = function(value) {
+                    var entities = {"&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "\x27": "&#39;"};
+                    return ("" + value).replace(/[&<>"\x27]/g, function(character) { return entities[character]; });
+                };
+                var Matcher = use("java.util.regex.Matcher");
           		var regexTitle = "<title>.*<\/title>";
-          		content = content.replaceAll(regexTitle, "<title>"+pwaName+"</title>");
+                content = content.replaceAll(regexTitle, Matcher.quoteReplacement("<title>"+escapeHtml(pwaName)+"</title>"));
           		// replace icon
           		var regexIcn = ''<link rel="icon" type=".*" href=".*">''
           		content = content.replaceAll(regexIcn, ''<link rel="icon" type="image/png" href="pwa-assets/manifest-icon-192.png"/>'');
           		// replace theme-color
           		var regexTheme = ''<meta name="theme-color" content=".*">'';
-          		content = content.replaceAll(regexTheme, ''<meta name="theme-color" content="''+pwaThemeColor+''">'');
+                content = content.replaceAll(regexTheme, Matcher.quoteReplacement(''<meta name="theme-color" content="''+escapeHtml(pwaThemeColor)+''">''));
           }
           catch(e){
           	log.warning("error index");
@@ -186,14 +196,19 @@ responseTimeout: 600
           var content = new JString(Files.readAllBytes(filePath), charset);
           try{
           		// replace title
+                var escapeHtml = function(value) {
+                    var entities = {"&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "\x27": "&#39;"};
+                    return ("" + value).replace(/[&<>"\x27]/g, function(character) { return entities[character]; });
+                };
+                var Matcher = use("java.util.regex.Matcher");
           		var regexTitle = "<title>.*<\/title>";
-          		content = content.replaceAll(regexTitle, "<title>"+pwaName+"</title>");
+                content = content.replaceAll(regexTitle, Matcher.quoteReplacement("<title>"+escapeHtml(pwaName)+"</title>"));
           		// replace icon
           		var regexIcn = ''<link rel="icon" type=".*" href=".*">''
           		content = content.replaceAll(regexIcn, ''<link rel="icon" type="image/png" href="pwa-assets/manifest-icon-192.png"/>'');
           		// replace theme-color
           		var regexTheme = ''<meta name="theme-color" content=".*">'';
-          		content = content.replaceAll(regexTheme, ''<meta name="theme-color" content="''+pwaThemeColor+''">'');
+                content = content.replaceAll(regexTheme, Matcher.quoteReplacement(''<meta name="theme-color" content="''+escapeHtml(pwaThemeColor)+''">''));
           		log.warning(JSON.stringify(""+content));
           }
           catch(e){

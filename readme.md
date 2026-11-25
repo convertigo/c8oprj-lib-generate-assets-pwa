@@ -44,6 +44,10 @@ For more technical informations : [documentation](./project.md)
 
 ## Sequences
 
+All the sequences of this library are **Private**: they cannot be called over HTTP (from a client application, a URL or an external tool). Call them from the server sequences of your project, with a Sequence step or with `callSequence` in a server-side script.
+
+The `target` variable of **generateAssets** and **generateAssetsV2** names the folder of the PWA under `DisplayObjects/pwas`: it may contain only letters, digits and underscores (`A-Z`, `a-z`, `0-9`, `_`), 120 characters at most. Any other value is refused with the error "invalid target". An empty `target` regenerates the assets of the mobile application itself.
+
 ### generateAssets
 
 **variables**
@@ -86,7 +90,7 @@ For more technical informations : [documentation](./project.md)
 <td>scrape</td><td>Scraping Apple Human Interface guidelines to fetch splash screen specs  [default: "false"]</td>
 </tr>
 <tr>
-<td>target</td><td></td>
+<td>target</td><td>folder of the PWA under DisplayObjects/pwas: only letters, digits and underscores, 120 characters at most; empty for the mobile application</td>
 </tr>
 </table>
 
@@ -135,7 +139,7 @@ For more technical informations : [documentation](./project.md)
 <td>scrape</td><td>Scraping Apple Human Interface guidelines to fetch splash screen specs  [default: "false"]</td>
 </tr>
 <tr>
-<td>target</td><td></td>
+<td>target</td><td>folder of the PWA under DisplayObjects/pwas: only letters, digits and underscores, 120 characters at most; empty for the mobile application</td>
 </tr>
 </table>
 
